@@ -54,7 +54,9 @@
 /*  ESTILO CAJITAS CATEGORIAS */
 .card:hover {
   border-color: #6c47ff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 4px 15px rgba(108, 71, 255, 0.2);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.1),
+    0 4px 15px rgba(108, 71, 255, 0.2);
   transform: translateY(-5px);
   transition: all 0.3s ease-in-out;
 }
@@ -146,7 +148,9 @@ table .btn-warning:hover {
   background-color: white;
   border: 1px solid #dcdcdc;
   color: #2f2f2f;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .btn-elegante:hover {
@@ -200,4 +204,116 @@ table .btn-warning:hover {
   color: #0d6efd;
   font-weight: 500;
   border-left: 4px solid #4f81a5;
+}
+
+:root {
+  --work-primary: #4f46e5;
+  --work-primary-dark: #4338ca;
+  --work-secondary: #6366f1;
+  --work-accent: #14b8a6;
+  --work-bg-soft: #f8fafc;
+  --work-text: #1f2937;
+  --work-muted: #64748b;
+  --work-border: #e2e8f0;
+}
+
+/* Apariencia general */
+body {
+  color: var(--work-text);
+  background-color: #ffffff;
+}
+
+/* Hero más profesional */
+.hero-section {
+  position: relative;
+}
+
+.hero-section .container {
+  animation: heroEntrada 0.8s ease-out both;
+}
+
+@keyframes heroEntrada {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tarjetas de categorías */
+.card {
+  cursor: pointer;
+  border: 1px solid var(--work-border);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.card h6 {
+  color: var(--work-text);
+  transition: color 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  border-color: var(--work-secondary);
+  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.14);
+}
+
+.card:hover h6 {
+  color: var(--work-primary);
+}
+
+/* Bloques principales */
+#proyectos,
+main,
+section {
+  scroll-margin-top: 70px;
+}
+
+/* Botones principales */
+.btn-primary {
+  background-color: var(--work-primary);
+  border-color: var(--work-primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--work-primary-dark);
+  border-color: var(--work-primary-dark);
+}
+
+/* Lista de proyectos */
+.list-group-item {
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.list-group-item:hover {
+  background-color: var(--work-bg-soft);
+  transform: translateX(3px);
+}
+
+/* Panel detalle */
+#detalleProyecto {
+  border-color: var(--work-border) !important;
+}
+
+/* Animación al aparecer */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.65s ease,
+    transform 0.65s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
