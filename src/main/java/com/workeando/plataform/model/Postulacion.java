@@ -6,7 +6,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-
 @Entity
 @Table(name = "postulaciones")
 public class Postulacion {
@@ -24,12 +23,18 @@ public class Postulacion {
     private LocalDate fechaPostulacion = LocalDate.now();
 
     // relacion en la base de datos con la entidad proyecto
-    @ManyToOne  //postulaciones - proyecto 
+    @ManyToOne // postulaciones - proyecto
     @JoinColumn(name = "proyecto_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonBackReference
-
     private Proyecto proyecto;
+
+    @ManyToOne
+    @JoinColumn(name = "freelancer_id")
+    private Freelancer freelancer;
+
+    @Column(nullable = false)
+    private String estado = "Pendiente";
 
     // constructor
     public Postulacion() {
@@ -44,6 +49,15 @@ public class Postulacion {
     }
 
     // Getters y setters
+
+    public Freelancer getFreelancer() {
+        return freelancer;
+    }
+
+    public void setFreelancer(Freelancer freelancer) {
+        this.freelancer = freelancer;
+    }
+
     public Long getId() {
         return id;
     }
@@ -62,6 +76,14 @@ public class Postulacion {
 
     public void setCorreoFreelancer(String correoFreelancer) {
         this.correoFreelancer = correoFreelancer;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 
     public Double getMontoPropuesto() {

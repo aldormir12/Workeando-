@@ -51,6 +51,9 @@
   border-radius: 0.75rem;
 }
 
+
+
+
 /*  ESTILO CAJITAS CATEGORIAS */
 .card:hover {
   border-color: #6c47ff;  
@@ -64,34 +67,36 @@
   border: 1px solid #e0e0e0;  /* Borde gris claro al principio */
 }
 
+
 .card {
   transition: all 0.3s ease-in-out;
 }
 
-/*free-html*/
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-.hero-section {
-    background: linear-gradient(to right, #6c47ff, #7a5cff);
-    color: white;
-}
-.card-custom {
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-.custom-btn {
-    background-color: #6c47ff;
-    color: white;
-    border-radius: 50px;
-    padding: 10px 30px;
-    font-weight: bold;
-}
-.custom-btn:hover {
-    background-color: #7a5cff;
-}
 
-/* Estilos personalizados para la tabla */
+/*free-html*/
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .hero-section {
+            background: linear-gradient(to right, #6c47ff, #7a5cff);
+            color: white;
+        }
+        .card-custom {
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .custom-btn {
+            background-color: #6c47ff;
+            color: white;
+            border-radius: 50px;
+            padding: 10px 30px;
+            font-weight: bold;
+        }
+        .custom-btn:hover {
+            background-color: #7a5cff;
+        }
+
+        /* Estilos personalizados para la tabla */
 table {
   margin-top: 30px;
   margin-bottom: 30px;
@@ -110,7 +115,7 @@ table th {
 }
 
 table tbody tr:hover {
-  background-color: #f1f1f1; /* resaltar la fila cuando se pase el mouse */
+  background-color: #f1f1f1; /* resaltar la fila cuando se pasa el mouse */
 }
 
 table td {
@@ -132,7 +137,6 @@ table .btn-warning:hover {
   background-color: #e0a800;
   transition: background-color 0.3s ease-in-out;
 }
-
 #contenidoProyecto {
   line-height: 1.4; /* Más compacto */
   font-size: 0.95rem;
@@ -183,369 +187,5 @@ table .btn-warning:hover {
 .btn-perfil:hover {
   background-color: #f8f9fa;
   border-color: #cfd4d9;
-}
-
-/* ===== ESTILOS MODERNOS PARA PAGINACIÓN ===== */
-
-/* Contenedor principal de paginación */
-.pagination-container {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 1rem;
-  padding: 1.5rem 2rem;
-  margin-top: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-/* Estilos para la paginación moderna */
-.pagination {
-  margin: 0;
-  padding: 0;
-  border-radius: 0.75rem !important;
-  overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-}
-
-.pagination .page-item {
-  margin: 0;
-}
-
-.pagination .page-link {
-  border: none !important;
-  color: #6b7280;
-  font-weight: 500;
-  font-size: 0.875rem;
-  padding: 0.75rem 1rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  background: white;
-  margin: 0;
-}
-
-.pagination .page-link:hover {
-  background: #f8fafc !important;
-  color: #374151;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.pagination .page-item.active .page-link {
-  background: #6366f1 !important;
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-  transform: translateY(-1px);
-}
-
-.pagination .page-item.disabled .page-link {
-  color: #d1d5db;
-  background: white;
-  cursor: not-allowed;
-}
-
-.pagination .page-item.disabled .page-link:hover {
-  transform: none;
-  box-shadow: none;
-  background: white !important;
-}
-
-/* Separadores de paginación */
-.pagination .page-item.disabled span {
-  color: #9ca3af;
-  font-weight: normal;
-}
-
-/* Botones de navegación (anterior/siguiente) */
-.pagination .page-link i {
-  font-size: 0.75rem;
-}
-
-/* Información de paginación */
-.pagination-info {
-  color: #6b7280;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.pagination-info .fw-semibold {
-  color: #374151;
-  font-weight: 600;
-}
-
-/* Controles de ordenamiento modernos */
-.sort-controls .dropdown-toggle {
-  background: white;
-  border: 1px solid #e5e7eb;
-  color: #374151;
-  font-weight: 500;
-  font-size: 0.875rem;
-  border-radius: 0.5rem;
-  padding: 0.625rem 1rem;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.sort-controls .dropdown-toggle:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-}
-
-.sort-controls .dropdown-menu {
-  border: none;
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  padding: 0.5rem;
-  margin-top: 0.25rem;
-}
-
-.sort-controls .dropdown-item {
-  color: #374151;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 0.375rem;
-  padding: 0.625rem 1rem;
-  margin: 0.125rem 0;
-  transition: all 0.15s ease;
-}
-
-.sort-controls .dropdown-item:hover {
-  background: #f3f4f6;
-  color: #111827;
-  transform: translateX(2px);
-}
-
-.sort-controls .dropdown-item i {
-  width: 1rem;
-  opacity: 0.7;
-}
-
-/* Estilos para tabla moderna */
-.modern-table {
-  background: white;
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f1f5f9;
-}
-
-.modern-table .table {
-  margin-bottom: 0;
-}
-
-.modern-table .table thead th {
-  background: #f8fafc;
-  border: none;
-  color: #475569;
-  font-weight: 600;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-  padding: 1rem;
-}
-
-.modern-table .table tbody tr {
-  border: none;
-  transition: all 0.2s ease;
-}
-
-.modern-table .table tbody tr:hover {
-  background: #fafbfc;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.modern-table .table tbody td {
-  border: none;
-  padding: 1rem;
-  vertical-align: middle;
-  border-top: 1px solid #f1f5f9;
-}
-
-/* Badges modernos para estados */
-.status-badge {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.375rem 0.875rem;
-  border-radius: 6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-}
-
-.status-badge.active {
-  background: #d1fae5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
-}
-
-.status-badge.inactive {
-  background: #f3f4f6;
-  color: #6b7280;
-  border: 1px solid #e5e7eb;
-}
-
-/* Dropdown de acciones moderno */
-.action-dropdown .dropdown-toggle {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #64748b;
-  border-radius: 50px;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.action-dropdown .dropdown-toggle:hover {
-  background: #e2e8f0;
-  color: #475569;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.action-dropdown .dropdown-menu {
-  border: none;
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  padding: 0.5rem;
-  min-width: 12rem;
-}
-
-.action-dropdown .dropdown-item {
-  border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 0.15s ease;
-}
-
-.action-dropdown .dropdown-item:hover {
-  background: #f1f5f9;
-  transform: translateX(2px);
-}
-
-.action-dropdown .dropdown-item.text-danger:hover {
-  background: #fef2f2;
-  color: #dc2626;
-}
-
-/* Estado vacío elegante */
-.empty-state {
-  padding: 4rem 2rem;
-  text-align: center;
-}
-
-.empty-state i {
-  color: #d1d5db;
-  margin-bottom: 1.5rem;
-}
-
-.empty-state h5 {
-  color: #6b7280;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-}
-
-.empty-state p {
-  color: #9ca3af;
-  max-width: 24rem;
-  margin: 0 auto 2rem;
-  line-height: 1.6;
-}
-
-/* Animaciones suaves */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.fade-in-up {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-/* Responsive para paginación */
-@media (max-width: 768px) {
-  .pagination-container {
-    padding: 1rem;
-    margin-top: 1rem;
-  }
-  
-  .pagination .page-link {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8125rem;
-  }
-  
-  .pagination-info {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-  
-  .sort-controls {
-    justify-content: center !important;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  
-  .sort-controls .dropdown-toggle {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8125rem;
-  }
-}
-
-/* Estados de carga suaves */
-.loading-skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-  border-radius: 0.375rem;
-}
-
-@keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-/* Mejoras para accesibilidad */
-.pagination .page-link:focus {
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-  outline: none;
-}
-
-.sort-controls .dropdown-toggle:focus {
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-  outline: none;
-}
-
-/* Transiciones globales mejoradas */
-* {
-  scroll-behavior: smooth;
-}
-
-.table-responsive {
-  border-radius: 1rem;
-  overflow: hidden;
-}
-
-/* Estilos específicos para el proyecto counter */
-.project-counter {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  display: inline-block;
-  margin-bottom: 1rem;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 

@@ -14,4 +14,7 @@ public interface FreelancerRepository extends JpaRepository<Freelancer, Long> {
     //Busca un freelancer por su usuario para saber si el perfil ya fue creado.
 
     Optional<Freelancer> findByUsuario(Usuario usuario);
+
+    Optional<Freelancer> findByUsuarioCorreo(String correo);
+
 }

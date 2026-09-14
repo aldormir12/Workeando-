@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
   <head>
@@ -13,8 +12,14 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       rel="stylesheet"
     />
+    <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+/>
+
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
   </head>
+
   <body>
     <!-- NAVBAR -->
     <header class="bg-light border-bottom">
@@ -84,242 +89,103 @@
       </div>
     </section>
 
-    <!-- SECCIÓN DE PROYECTOS PUBLICADOS CON PAGINACIÓN ELEGANTE -->
-    <section class="py-5 bg-white">
-      <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h2 class="fw-bold text-dark mb-2">Proyectos publicados</h2>
-            <p class="text-muted mb-0" th:if="${totalElements > 0}">
-              Mostrando <span class="fw-semibold" th:text="${proyectosPage.numberOfElements}">0</span> 
-              de <span class="fw-semibold" th:text="${totalElements}">0</span> proyectos
-            </p>
-          </div>
-          
-          <!-- Controles de ordenamiento y tamaño de página -->
-          <div class="d-flex gap-3 align-items-center">
-            <div class="dropdown">
-              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="fas fa-sort me-1"></i>
-                Ordenar por
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" th:href="@{/emple(page=${currentPage}, size=${size}, sortBy='fechaPublicacion', sortDirection='desc')}">
-                  <i class="fas fa-calendar-alt me-2 text-primary"></i>Más recientes
-                </a></li>
-                <li><a class="dropdown-item" th:href="@{/emple(page=${currentPage}, size=${size}, sortBy='fechaPublicacion', sortDirection='asc')}">
-                  <i class="fas fa-calendar-alt me-2 text-secondary"></i>Más antiguos
-                </a></li>
-                <li><a class="dropdown-item" th:href="@{/emple(page=${currentPage}, size=${size}, sortBy='titulo', sortDirection='asc')}">
-                  <i class="fas fa-sort-alpha-down me-2 text-info"></i>Título A-Z
-                </a></li>
-                <li><a class="dropdown-item" th:href="@{/emple(page=${currentPage}, size=${size}, sortBy='estado', sortDirection='asc')}">
-                  <i class="fas fa-toggle-on me-2 text-success"></i>Por estado
-                </a></li>
-              </ul>
-            </div>
-            
-            <div class="dropdown">
-              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="fas fa-list me-1"></i>
-                <span th:text="${size}">5</span> por página
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" th:href="@{/emple(page=0, size=5, sortBy=${sortBy}, sortDirection=${sortDirection})}">5 por página</a></li>
-                <li><a class="dropdown-item" th:href="@{/emple(page=0, size=10, sortBy=${sortBy}, sortDirection=${sortDirection})}">10 por página</a></li>
-                <li><a class="dropdown-item" th:href="@{/emple(page=0, size=20, sortBy=${sortBy}, sortDirection=${sortDirection})}">20 por página</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
+    <!-- Mostrar lista de proyectos publicados -->
+    <h2 class="fw-bold text-primary mb-4 mt-5 ms-5">Proyectos publicados</h2>
 
-        <!-- Tabla de proyectos -->
-        <div id="tablaproyectos" class="card border-0 shadow-sm rounded-3 overflow-hidden">
-          <div th:if="${proyectos.isEmpty()}" class="card-body text-center py-5">
-            <div class="text-muted">
-              <i class="fas fa-folder-open fa-3x mb-3 text-secondary"></i>
-              <h5 class="text-secondary">No tienes proyectos publicados</h5>
-              <p class="mb-4">Comienza publicando tu primer proyecto y encuentra el talento perfecto.</p>
-              <button
-                class="btn btn-primary btn-lg"
-                data-bs-toggle="modal"
-                data-bs-target="#modalPublicarProyecto"
-              >
-                <i class="fas fa-plus me-2"></i>Publicar mi primer proyecto
-              </button>
-            </div>
-          </div>
-
-          <div th:if="${!proyectos.isEmpty()}">
-            <div class="table-responsive">
-              <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th class="border-0 px-4 py-3">
-                      <div class="d-flex align-items-center">
-                        <i class="fas fa-project-diagram me-2 text-primary"></i>
-                        Proyecto
-                      </div>
-                    </th>
-                    <th class="border-0 px-4 py-3">
-                      <div class="d-flex align-items-center">
-                        <i class="fas fa-align-left me-2 text-secondary"></i>
-                        Descripción
-                      </div>
-                    </th>
-                    <th class="border-0 px-4 py-3">
-                      <div class="d-flex align-items-center">
-                        <i class="fas fa-toggle-on me-2 text-success"></i>
-                        Estado
-                      </div>
-                    </th>
-                    <th class="border-0 px-4 py-3 text-center">
-                      <i class="fas fa-cogs me-1 text-dark"></i>
-                      Acciones
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr th:each="proyecto : ${proyectos}" class="border-bottom">
-                    <td class="px-4 py-3">
-                      <div>
-                        <h6 class="mb-1 fw-semibold text-dark" th:text="${proyecto.titulo}">Título del proyecto</h6>
-                        <small class="text-muted">
-                          <i class="fas fa-calendar-alt me-1"></i>
-                          Publicado <span th:text="${#temporals.format(proyecto.fechaPublicacion, 'dd/MM/yyyy HH:mm')}">fecha</span>
-                        </small>
-                      </div>
-                    </td>
-                    <td class="px-4 py-3">
-                      <p class="mb-0 text-muted" th:text="${#strings.abbreviate(proyecto.descripcion, 80)}" style="line-height: 1.4;">
-                        Descripción del proyecto...
-                      </p>
-                    </td>
-                    <td class="px-4 py-3">
-                      <span class="badge rounded-pill px-3 py-2" 
-                            th:classappend="${proyecto.estado == 'Abierto'} ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle'"
-                            th:text="${proyecto.estado}">Estado</span>
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                      <div class="dropdown">
-                        <button
-                          class="btn btn-light btn-sm dropdown-toggle rounded-pill px-3"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i class="fas fa-ellipsis-h"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="min-width: 180px;">
-                          <li>
-                            <button
-                              class="dropdown-item d-flex align-items-center"
-                              th:onclick="'cambiarEstado(this, ' + ${proyecto.id} + ')'"
-                            >
-                              <i th:class="${proyecto.estado == 'Abierto'} ? 'fas fa-pause-circle me-2 text-warning' : 'fas fa-play-circle me-2 text-success'"></i>
-                              <span th:text="${proyecto.estado == 'Abierto' ? 'Pausar proyecto' : 'Activar proyecto'}">Acción</span>
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              class="dropdown-item d-flex align-items-center"
-                              th:onclick="'abrirModalEdicion(' + ${proyecto.id} + ')'"
-                            >
-                              <i class="fas fa-edit me-2 text-primary"></i>
-                              Editar proyecto
-                            </button>
-                          </li>
-                          <li><hr class="dropdown-divider"></li>
-                          <li>
-                            <button
-                              class="dropdown-item d-flex align-items-center text-danger"
-                              th:onclick="'eliminarProyecto(this, ' + ${proyecto.id} + ')'"
-                            >
-                              <i class="fas fa-trash-alt me-2"></i>
-                              Eliminar proyecto
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- PAGINACIÓN ELEGANTE Y MODERNA -->
-            <div class="card-footer bg-white border-0 px-4 py-4" th:if="${totalPages > 1}">
-              <div class="row align-items-center">
-                <div class="col-md-6">
-                  <p class="text-muted small mb-0">
-                    Página <span class="fw-semibold" th:text="${currentPage + 1}">1</span> 
-                    de <span class="fw-semibold" th:text="${totalPages}">1</span>
-                    • Total: <span class="fw-semibold" th:text="${totalElements}">0</span> proyectos
-                  </p>
-                </div>
-                <div class="col-md-6">
-                  <nav aria-label="Navegación de páginas" class="d-flex justify-content-md-end justify-content-center">
-                    <ul class="pagination pagination-sm mb-0 shadow-sm rounded-3 overflow-hidden border">
-                      
-                      <!-- Botón Anterior -->
-                      <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link border-0 bg-white text-dark" 
-                           th:href="${currentPage > 0} ? @{/emple(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})} : '#'"
-                           aria-label="Anterior">
-                          <i class="fas fa-chevron-left"></i>
-                        </a>
-                      </li>
-
-                      <!-- Primera página si no está visible -->
-                      <li class="page-item" th:if="${startPage > 0}">
-                        <a class="page-link border-0 bg-white text-dark" 
-                           th:href="@{/emple(page=0, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">1</a>
-                      </li>
-                      
-                      <!-- Separador si hay gap -->
-                      <li class="page-item disabled" th:if="${startPage > 1}">
-                        <span class="page-link border-0 bg-white text-muted">...</span>
-                      </li>
-
-                      <!-- Páginas del rango -->
-                      <li class="page-item" 
-                          th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
-                          th:classappend="${pageNum == currentPage} ? 'active'">
-                        <a class="page-link border-0" 
-                           th:classappend="${pageNum == currentPage} ? 'bg-primary text-white' : 'bg-white text-dark'"
-                           th:href="@{/emple(page=${pageNum}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}"
-                           th:text="${pageNum + 1}">1</a>
-                      </li>
-
-                      <!-- Separador si hay gap al final -->
-                      <li class="page-item disabled" th:if="${endPage < totalPages - 2}">
-                        <span class="page-link border-0 bg-white text-muted">...</span>
-                      </li>
-                      
-                      <!-- Última página si no está visible -->
-                      <li class="page-item" th:if="${endPage < totalPages - 1}">
-                        <a class="page-link border-0 bg-white text-dark" 
-                           th:href="@{/emple(page=${totalPages - 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}"
-                           th:text="${totalPages}">Última</a>
-                      </li>
-
-                      <!-- Botón Siguiente -->
-                      <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
-                        <a class="page-link border-0 bg-white text-dark" 
-                           th:href="${currentPage < totalPages - 1} ? @{/emple(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})} : '#'"
-                           aria-label="Siguiente">
-                          <i class="fas fa-chevron-right"></i>
-                        </a>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
+    <!-- Tabla de proyectos -->
+    <div class="container" id="tablaproyectos">
+      <table class="table table-striped table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="proyecto : ${proyectos}">
+            <td th:text="${proyecto.titulo}"></td>
+            <td
+              th:text="${#strings.abbreviate(proyecto.descripcion, 100)}"
+            ></td>
+            <td th:text="${proyecto.estado}" class="estado-proyecto"></td>
+            <td>
+              <div class="dropdown">
+                <button
+                  class="btn btn-outline-dark btn-sm dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                >
+                  Acciones
+                </button>
+                <ul class="dropdown-menu">
+                  <li>
+                    <button
+                      class="dropdown-item"
+                      th:id="'estado-btn-' + ${proyecto.id}"
+                      th:text="${proyecto.estado == 'Abierto' ? 'Cerrar' : 'Abrir'}"
+                      th:onclick="'cambiarEstado(this, ' + ${proyecto.id} + ')'"
+                    ></button>
+                  </li>
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      th:onclick="'abrirModalEdicion(' + ${proyecto.id} + ')'"
+                      style="cursor: pointer"
+                    >
+                      Editar
+                    </a>
+                  </li>
+                  <li>
+                    <button
+                      class="dropdown-item"
+                      th:onclick="'eliminarProyecto(this, ' + ${proyecto.id} + ')'"
+                    >
+                      Eliminar
+                    </button>
+                  </li>
+                </ul>
               </div>
-            </div>
-          </div>
-        </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Paginación de proyectos">
+          <ul class="pagination">
+            <li
+              class="page-item"
+              th:classappend="${!proyectosPage.hasPrevious()} ? 'disabled'"
+            >
+              <a
+                class="page-link"
+                th:href="@{/emple(pageProyectos=${proyectosPage.number - 1}, pagePostulaciones=${postulacionesPage.number})}"
+                >Anterior</a
+              >
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">
+                Página <span th:text="${proyectosPage.number + 1}">1</span> de
+                <span th:text="${proyectosPage.totalPages}">1</span>
+              </span>
+            </li>
+            <li
+              class="page-item"
+              th:classappend="${!proyectosPage.hasNext()} ? 'disabled'"
+            >
+              <a
+                class="page-link"
+                th:href="@{/emple(pageProyectos=${proyectosPage.number + 1}, pagePostulaciones=${postulacionesPage.number})}"
+                >Siguiente</a
+              >
+            </li>
+          </ul>
+        </nav>
       </div>
-    </section>
+    </div>
+
+    <section class="py-5"></section>
 
     <!-- BOTÓN PARA ABRIR MODAL DE PUBLICAR NUEVO PROYECTO -->
     <section class="py-5 bg-light text-center">
@@ -340,7 +206,6 @@
         </button>
       </div>
     </section>
-
     <!-- Modal para publicar proyecto -->
     <div
       class="modal fade"
@@ -512,7 +377,6 @@
         </div>
       </div>
     </div>
-    
     <!-- Modal de éxito -->
     <div
       class="modal fade"
@@ -545,7 +409,6 @@
         </div>
       </div>
     </div>
-    
     <!-- Modal Confirmar Eliminación -->
     <div
       class="modal fade"
@@ -597,79 +460,183 @@
       class="toast-container position-fixed bottom-0 end-0 p-3"
     ></div>
 
+<div class="d-flex justify-content-end mt-3">
+  <button
+    class="btn btn-sm btn-outline-dark px-3 me-4"
+    type="button"
+    data-bs-toggle="offcanvas"
+    data-bs-target="#historialPostulaciones"
+    aria-controls="historialPostulaciones"
+  >
+    <i class="bi bi-clock-history me-1"></i> Ver historial de decisiones
+  </button>
+</div>
+
+
     <!-- PROPOSICIONES RECIBIDAS -->
     <section class="py-5">
-      <div class="container">
-        <h2 class="fw-bold text-primary mb-4">Propuestas Recibidas</h2>
+      <h2 id="propuestas" class="fw-bold text-primary mb-4 ps-4">
+        Propuestas Recibidas
+      </h2>
 
-        <div class="row g-3" th:if="${postulaciones != null}">
-          <div class="col-12" th:each="postulacion : ${postulaciones}">
-            <div
-              class="border rounded px-4 py-3 d-flex justify-content-between align-items-center flex-wrap shadow-sm bg-white"
-              th:attr="data-modalidad=${postulacion.proyecto.modalidadPago.name()}"
-            >
-              <!-- Información -->
-              <div
-                class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 flex-grow-1"
-              >
+      <div class="container-fluid px-0">
+        <div class="d-flex justify-content-center">
+          <div class="px-5 mx-auto" style="max-width: 100%">
+            <div class="pagination">
+              <div class="row g-3" th:if="${postulaciones != null}">
                 <div
-                  class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center"
-                  style="width: 45px; height: 45px; font-weight: bold"
+                  class="col-12"
+                  th:each="postulacion : ${postulaciones}"
+                  th:if="${postulacion.estado == 'Pendiente'}"
                 >
-                  <span th:text="${postulacion.nombreFreelancer.substring(0,1)}"
-                    >F</span
-                  >
-                </div>
-                <div>
                   <div
-                    class="fw-semibold mb-1"
-                    th:text="'Propuesta para ' + ${postulacion.proyecto.titulo}"
+                    class="border rounded px-4 py-3 d-flex justify-content-between align-items-center flex-wrap shadow-sm bg-white w-100"
+                    th:attr="data-modalidad=${postulacion.proyecto.modalidadPago.name()}"
                   >
-                    Título del proyecto
-                  </div>
-                  <div
-                    class="text-muted small"
-                    th:text="${postulacion.nombreFreelancer}"
-                  >
-                    Nombre del freelancer
-                  </div>
-                  <div class="text-muted small">
-                    <strong>Correo:</strong>
-                    <span th:text="${postulacion.correoFreelancer}"
-                      >correo</span
+                    <!-- Información -->
+                    <div
+                      class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 flex-grow-1"
                     >
+                      <div
+                        class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center"
+                        style="width: 45px; height: 45px; font-weight: bold"
+                      >
+                        <span
+                          th:text="${postulacion.nombreFreelancer.substring(0,1)}"
+                          >F</span
+                        >
+                      </div>
+                      <div>
+                        <div
+                          class="fw-semibold mb-1"
+                          th:text="'Propuesta para ' + ${postulacion.proyecto.titulo}"
+                        >
+                          Título del proyecto
+                        </div>
+                        <div
+                          class="text-muted small"
+                          th:text="${postulacion.nombreFreelancer}"
+                        >
+                          Nombre del freelancer
+                        </div>
+                        <div class="text-muted small">
+                          <strong>Correo:</strong>
+                          <span th:text="${postulacion.correoFreelancer}"
+                            >correo</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Monto y acciones -->
+                    <div class="text-end mt-3 mt-sm-0">
+                      <div th:if="${postulacion.montoPropuesto != null}">
+                        <span
+                          class="badge bg-warning text-dark px-3 py-2 rounded-pill"
+                        >
+                          Contraoferta:
+                          <span th:text="'S/ ' + ${postulacion.montoPropuesto}"
+                            >S/ 0.00</span
+                          >
+                          <span
+                            class="modalidad-text ms-1"
+                            th:text="'(' + ${postulacion.proyecto.modalidadPago.name()} + ')'"
+                            >(modalidad)</span
+                          >
+                        </span>
+                      </div>
+
+                      <p class="mb-2">
+                        <strong>Estado:</strong>
+                        <span th:text="${postulacion.estado}"></span>
+                      </p>
+                      <div
+                        class="action-buttons d-flex flex-wrap justify-content-end gap-2 mt-3"
+                      >
+                        <!-- Aceptar -->
+                        <form
+                          th:action="@{'/postulaciones/' + ${postulacion.id} + '/aceptar'}"
+                          method="post"
+                        >
+                          <button
+                            type="submit"
+                            class="btn-elegante btn-aceptar"
+                          >
+                            Aceptar
+                          </button>
+                        </form>
+
+                        <!-- Rechazar -->
+                        <form
+                          th:action="@{'/postulaciones/' + ${postulacion.id} + '/rechazar'}"
+                          method="post"
+                        >
+                          <button
+                            type="submit"
+                            class="btn-elegante btn-rechazar"
+                          >
+                            Rechazar
+                          </button>
+                        </form>
+
+                        <!-- Evitar errores si no hay freelancer asociado -->
+                        <a
+                          th:if="${postulacion.freelancer != null}"
+                          th:href="@{'/freelancer/perfil/' + ${postulacion.freelancer.idFreelancer} + '#formularioPerfil'}"
+                          class="btn btn-outline-primary"
+                        >
+                          Ver perfil
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Monto y acciones -->
-              <div class="text-end mt-3 mt-sm-0">
-                <div th:if="${postulacion.montoPropuesto != null}">
-                  <span
-                    class="badge bg-warning text-dark px-3 py-2 rounded-pill"
-                  >
-                    Contraoferta:
-                    <span th:text="'S/ ' + ${postulacion.montoPropuesto}"
-                      >S/ 0.00</span
-                    >
-                    <span class="modalidad-text ms-1">(modalidad)</span>
-                  </span>
-                </div>
-                <div
-                  class="action-buttons d-flex flex-wrap justify-content-end gap-2 mt-3"
-                >
-                  <button class="btn-elegante btn-aceptar">Aceptar</button>
-                  <button class="btn-elegante btn-rechazar">Rechazar</button>
-                  <button class="btn-elegante btn-perfil">Ver perfil</button>
+              <div
+                th:if="${postulaciones.size() == 0}"
+                class="d-flex justify-content-center"
+              >
+                <div class="alert alert-info text-center w-75">
+                  No tienes propuestas recibidas aún.
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div th:if="${postulaciones.size() == 0}">
-          <div class="alert alert-info text-center">
-            No tienes propuestas recibidas aún.
+            <div class="d-flex justify-content-center mt-4">
+              <nav aria-label="Paginación de postulaciones">
+                <ul class="pagination">
+                  <li
+                    class="page-item"
+                    th:classappend="${!postulacionesPage.hasPrevious()} ? 'disabled'"
+                  >
+                    <a
+                      class="page-link"
+                      th:href="@{/emple(pageProyectos=${proyectosPage.number}, pagePostulaciones=${postulacionesPage.number - 1})}"
+                      >Anterior</a
+                    >
+                  </li>
+                  <li class="page-item disabled">
+                    <span class="page-link">
+                      Página
+                      <span th:text="${postulacionesPage.number + 1}">1</span>
+                      de
+                      <span th:text="${postulacionesPage.totalPages}">1</span>
+                    </span>
+                  </li>
+                  <li
+                    class="page-item"
+                    th:classappend="${!postulacionesPage.hasNext()} ? 'disabled'"
+                  >
+                    <a
+                      class="page-link"
+                      th:href="@{/emple(pageProyectos=${proyectosPage.number}, pagePostulaciones=${postulacionesPage.number + 1})}"
+                      >Siguiente</a
+                    >
+                  </li>
+                </ul>
+              </nav>
+            </div>
           </div>
         </div>
       </div>
@@ -798,10 +765,64 @@
         </div>
       </div>
     </section>
+    <div
+  class="offcanvas offcanvas-end shadow-lg rounded-3"
+  tabindex="-1"
+  id="historialPostulaciones"
+  aria-labelledby="historialPostulacionesLabel"
+>
+  <div class="offcanvas-header border-bottom">
+    <h5 class="offcanvas-title" id="historialPostulacionesLabel">
+      <i class="bi bi-clipboard-check me-2 text-muted"></i> Historial de Postulaciones
+    </h5>
+    <button
+      type="button"
+      class="btn-close text-reset"
+      data-bs-dismiss="offcanvas"
+      aria-label="Cerrar"
+    ></button>
+  </div>
+  <div class="offcanvas-body">
+    <div
+      th:each="postulacion : ${postulaciones}"
+      th:if="${postulacion.estado != 'Pendiente'}"
+      class="mb-4 border-bottom pb-2"
+    >
+      <!-- Proyecto -->
+      <p>
+        <i class="bi bi-file-earmark-text me-2 text-muted"></i>
+        <strong>Proyecto:</strong>
+        <span th:text="${postulacion.proyecto.titulo}"></span>
+      </p>
+
+      <!-- Freelancer -->
+      <p>
+        <i class="bi bi-person-circle me-2 text-muted"></i>
+        <strong>Freelancer:</strong>
+        <span th:text="${postulacion.nombreFreelancer}"></span>
+      </p>
+
+      <!-- Monto (solo si está presente) -->
+      <p th:if="${postulacion.montoPropuesto != null}">
+        <i class="bi bi-cash-stack me-2 text-muted"></i>
+        <strong>Monto:</strong> S/
+        <span th:text="${postulacion.montoPropuesto}"></span>
+      </p>
+
+      <!-- Estado -->
+      <p>
+        <i class="bi bi-check-circle me-2 text-muted"></i>
+        <strong>Estado:</strong>
+        <span class="badge"
+          th:classappend="${postulacion.estado == 'Aceptada' ? 'bg-success' : (postulacion.estado == 'Rechazada' ? 'bg-danger' : 'bg-warning')}"
+          th:text="${postulacion.estado}"></span>
+      </p>
+    </div>
+  </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script th:src="@{/js/tabla.js}"></script>
   </body>
 </html>
-

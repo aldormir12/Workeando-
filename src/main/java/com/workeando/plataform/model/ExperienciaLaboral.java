@@ -1,10 +1,8 @@
 package com.workeando.plataform.model;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.Embeddable;
-
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Embeddable
@@ -17,23 +15,19 @@ public class ExperienciaLaboral {
     private String puesto;
 
     @NotBlank(message = "La descripción es obligatoria")
-    @Size(max = 500)
+    @Size(max = 500, message = "La descripción no debe exceder los 500 caracteres")
     private String descripcion;
 
-    @NotBlank(message = "El período es obligatorio")
-    private String periodo; // Ejemplo: "Enero 2020 - Marzo 2023"
-    private LocalDate fechaDesde;
-    private LocalDate fechaHasta;
+    @NotBlank(message = "La fecha de inicio es obligatoria")
+    @Pattern(regexp = "^\\d{2}/\\d{4}$", message = "La fecha de inicio debe tener el formato MM/YYYY")
+    private String fechaDesde;
 
-    public LocalDate getFechaDesde() {
-        return fechaDesde;
-    }
+    @NotBlank(message = "La fecha de fin es obligatoria")
+    @Pattern(regexp = "^(\\d{2}/\\d{4}|Actualidad)$", message = "La fecha de fin debe tener el formato MM/YYYY o ser 'Actualidad'")
+    private String fechaHasta;
 
-    public LocalDate getFechaHasta() {
-        return fechaHasta;
-    }
+    // Getters y Setters
 
-    // Getters y setters
     public String getEmpresa() {
         return empresa;
     }
@@ -58,12 +52,19 @@ public class ExperienciaLaboral {
         this.descripcion = descripcion;
     }
 
-    public String getPeriodo() {
-        return periodo;
+    public String getFechaDesde() {
+        return fechaDesde;
     }
 
-    public void setPeriodo(String periodo) {
-        this.periodo = periodo;
+    public void setFechaDesde(String fechaDesde) {
+        this.fechaDesde = fechaDesde;
     }
 
+    public String getFechaHasta() {
+        return fechaHasta;
+    }
+
+    public void setFechaHasta(String fechaHasta) {
+        this.fechaHasta = fechaHasta;
+    }
 }

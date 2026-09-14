@@ -2,7 +2,7 @@ package com.workeando.plataform.controller;
 
 import com.workeando.plataform.model.Usuario;
 import com.workeando.plataform.model.Usuario.Rol;
-import com.workeando.plataform.service.impl.UsuarioServiceImpl;
+import com.workeando.plataform.service.UsuarioService;
 
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -17,9 +17,9 @@ import java.util.Optional;
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
-    private final UsuarioServiceImpl usuarioService;
+    private final UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioServiceImpl usuarioService) {
+    public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
 

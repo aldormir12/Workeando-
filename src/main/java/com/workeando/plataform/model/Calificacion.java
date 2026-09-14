@@ -1,8 +1,16 @@
 package com.workeando.plataform.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "calificacion")
 public class Calificacion {
 
     @Id
@@ -10,59 +18,31 @@ public class Calificacion {
     private Integer idCalificacion;
 
     @ManyToOne
-    @JoinColumn(name = "Contrato_idContrato")
+    @JoinColumn(name = "idContrato", nullable = false)
     private Contrato contrato;
 
-    private Integer calificador_id;
-    private Integer calificado_id;
+    @Column(name = "Calificador_id", nullable = false)
+    private Integer calificadorId;
+
+    @Column(nullable = false)
     private Integer puntuacion;
+
+    @Column(columnDefinition = "TEXT")
     private String comentario;
 
-    public Integer getIdCalificacion() {
-        return idCalificacion;
-    }
+    // Getters y Setters
+    public Integer getIdCalificacion() { return idCalificacion; }
+    public void setIdCalificacion(Integer idCalificacion) { this.idCalificacion = idCalificacion; }
 
-    public void setIdCalificacion(Integer idCalificacion) {
-        this.idCalificacion = idCalificacion;
-    }
+    public Contrato getContrato() { return contrato; }
+    public void setContrato(Contrato contrato) { this.contrato = contrato; }
 
-    public Contrato getContrato() {
-        return contrato;
-    }
+    public Integer getCalificadorId() { return calificadorId; }
+    public void setCalificadorId(Integer calificadorId) { this.calificadorId = calificadorId; }
 
-    public void setContrato(Contrato contrato) {
-        this.contrato = contrato;
-    }
+    public Integer getPuntuacion() { return puntuacion; }
+    public void setPuntuacion(Integer puntuacion) { this.puntuacion = puntuacion; }
 
-    public Integer getCalificador_id() {
-        return calificador_id;
-    }
-
-    public void setCalificador_id(Integer calificador_id) {
-        this.calificador_id = calificador_id;
-    }
-
-    public Integer getCalificado_id() {
-        return calificado_id;
-    }
-
-    public void setCalificado_id(Integer calificado_id) {
-        this.calificado_id = calificado_id;
-    }
-
-    public Integer getPuntuacion() {
-        return puntuacion;
-    }
-
-    public void setPuntuacion(Integer puntuacion) {
-        this.puntuacion = puntuacion;
-    }
-
-    public String getComentario() {
-        return comentario;
-    }
-
-    public void setComentario(String comentario) {
-        this.comentario = comentario;
-    }
+    public String getComentario() { return comentario; }
+    public void setComentario(String comentario) { this.comentario = comentario; }
 }

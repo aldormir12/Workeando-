@@ -1,0 +1,54 @@
+/* Estilos para la alerta flotante */
+.floating-alert {
+    position: fixed;
+    top: 10px;  /* Distancia desde el top */
+    left: 50%;
+    transform: translateX(-50%); /* Centrado horizontal */
+    z-index: 9999; /* Asegurarse de que quede sobre otros elementos */
+    width: 90%; /* Para que ocupe un buen ancho */
+    max-width: 600px; /* Ancho máximo */
+    padding: 15px 25px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Sombras para darle profundidad */
+    border-radius: 5px;
+    opacity: 0;
+    animation: slideIn 1s forwards;  /* Animación de entrada */
+    background-color: #ffcc00; /* Color de fondo amarillo suave */
+    color: #333; /* Color del texto */
+    font-size: 1.1rem; /* Tamaño del texto */
+}
+
+/* Animación de deslizamiento hacia abajo */
+@keyframes slideIn {
+    0% {
+        top: -100px;
+        opacity: 0;
+    }
+    100% {
+        top: 10px;
+        opacity: 1;
+    }
+}
+
+/* Estilo de los botones */
+.floating-alert .btn-primary {
+    margin-left: 15px;
+    background-color: #007bff; /* Fondo azul para el botón */
+    border-color: #007bff; /* Borde azul para el botón */
+}
+
+.floating-alert .btn-primary:hover {
+    background-color: #0056b3; /* Fondo más oscuro al pasar el mouse */
+    border-color: #0056b3; /* Borde más oscuro al pasar el mouse */
+}
+
+/* Estilos para el botón de cierre */
+.floating-alert .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 1.5rem;
+    cursor: pointer;
+}

@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
   <head>
     <meta charset="UTF-8" />
     <title>Crear Perfil</title>
@@ -12,6 +15,10 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" th:href="@{/css/perfil.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
   </head>
 
   <body class="bg-light">
@@ -20,6 +27,7 @@
       <div
         id="pantallaSeleccion"
         class="d-flex flex-column min-vh-100 justify-content-between py-5"
+        th:if="${(soloLectura != null and !soloLectura) and (modoEdicion != null and !modoEdicion) and (cvProcesado != null and !cvProcesado)}"
       >
         <div class="container">
           <h2 class="text-center fw-bold display-6 mb-5">
@@ -33,7 +41,6 @@
                 id="opcionCv"
                 class="card opcion-perfil text-center p-4 h-100 position-relative"
                 role="button"
-                onclick="seleccionarOpcion('cv')"
               >
                 <div class="card-body">
                   <i
@@ -66,10 +73,10 @@
                 id="opcionManual"
                 class="card opcion-perfil text-center p-4 h-100 position-relative"
                 role="button"
-                onclick="seleccionarOpcion('manual')"
               >
                 <div class="card-body">
                   <i class="bi bi-pencil-square display-5 text-dark mb-3"></i>
+
                   <!-- Manual -->
 
                   <h5 class="fw-semibold">Completar mi perfil manualmente</h5>
@@ -104,12 +111,7 @@
               </button>
             </div>
             <div class="col-auto">
-              <button
-                id="btnContinuar"
-                class="btn btn-primary"
-                disabled
-                onclick="continuar()"
-              >
+              <button id="btnContinuar" class="btn btn-primary" disabled>
                 Continuar →
               </button>
             </div>
@@ -127,6 +129,8 @@
 
         <form
           id="formSubirCv"
+          action="/free/subirCv"
+          method="post"
           enctype="multipart/form-data"
           class="mb-4"
           style="max-width: 500px; margin: auto"
@@ -136,11 +140,12 @@
               type="file"
               class="form-control"
               id="cvFile"
-              name="archivoCv"
+              name="cvFile"
               accept=".pdf,.doc,.docx"
               required
             />
           </div>
+
           <div class="d-flex justify-content-between">
             <button
               type="button"
@@ -154,227 +159,689 @@
         </form>
       </div>
 
+        <!-- Overlay de carga -->
+      <div
+        id="cvOverlayCarga"
+        class="d-none position-fixed top-0 start-0 w-100 h-100 z-50 d-flex flex-column justify-content-center align-items-center"
+        style="
+          backdrop-filter: blur(6px);
+          background-color: rgba(255, 255, 255, 0.6);
+          pointer-events: all;
+        "
+      >
+        <i
+          class="bi bi-file-earmark-text"
+          style="font-size: 3.5rem; color: #6c757d"
+        ></i>
+
+        <!-- Spinner de carga -->
+        <div
+          class="spinner-border text-primary mt-4"
+          role="status"
+          style="width: 3rem; height: 3rem; border-width: 0.3rem"
+        >
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+
+        <!-- Texto principal con animación -->
+        <p
+          id="textoCarga"
+          class="mt-4 fs-5 fw-semibold text-center fade-blink"
+          style="color: #333333"
+        >
+          Estamos leyendo tu CV...
+        </p>
+
+        <p class="text-muted text-center" style="font-size: 0.9rem">
+          Esto puede tardar unos segundos.
+        </p>
+      </div>
+
+      <!-- FORMULARIO CURRICULUM-->
+
       <div id="formularioPerfil" class="form-section fade-in">
-        <h2 class="text-center mb-4 text-primary">
-          Crear Perfil de Freelancer
-        </h2>
+        <div class="text-center mb-4">
+          <i class="bi bi-person-circle fs-1 text-dark"></i>
+
+          <h2
+            class="text-dark fw-bold mt-2"
+            th:text="${modoEdicion} ? 'Editar Perfil de Freelancer' 
+               : (soloLectura ? 'Perfil del Freelancer' : 'Crear Perfil de Freelancer')"
+          ></h2>
+
+          <p
+            class="text-secondary"
+            th:text="${modoEdicion} ? 'Actualiza la información de tu perfil.' 
+              : (soloLectura ? 'Estás visualizando este perfil en modo lectura como empleador.' 
+                             : 'Completa tu perfil para resaltar tus competencias y trayectoria profesional.')"
+          ></p>
+        </div>
 
         <form
           th:action="@{/free/perfil}"
           th:object="${freelancer}"
           method="post"
+          class="p-3 border rounded shadow-sm bg-white"
         >
-          <!-- Categorías -->
-          <div class="mb-3">
-            <label class="form-label">Categorías de tu preferencia *</label>
-            <div class="row">
-              <div class="col-md-6" th:each="cat : ${categorias}">
-                <div class="form-check">
+          <input type="hidden" th:field="*{idFreelancer}" />
+
+          <!-- EXPERIENCIA LABORAL -->
+          <div class="card shadow-sm mb-4 border-0">
+            <div class="card-body bg-light rounded-3">
+              <h5
+                class="card-title fw-bold text-dark mb-3 d-flex align-items-center"
+              >
+                <span
+                  class="d-inline-flex align-items-center justify-content-center rounded-3 me-2"
+                  style="width: 40px; height: 40px; background-color: #d6c3f9"
+                >
+                  <i class="bi bi-briefcase-fill text-dark fs-5"></i>
+                </span>
+                Experiencia Laboral
+              </h5>
+
+              <!-- MODO SOLO LECTURA -->
+              <div th:if="${soloLectura != null and soloLectura}">
+                <div
+                  th:each="exp : *{experienciaLaboral}"
+                  class="border rounded p-4 mb-3 bg-white"
+                >
+                  <h6 class="fw-semibold text-secondary mb-3">
+                    <i class="bi bi-award-fill me-1 text-dark"></i>
+                    <span th:text="${exp.puesto}"></span>
+                  </h6>
+
+                  <p class="mb-2">
+                    <strong>Empresa:</strong>
+                    <span th:text="${exp.empresa}"></span>
+                  </p>
+
+                  <p class="mb-2">
+                    <strong>Periodo:</strong>
+                    <span th:text="${exp.fechaDesde}"></span> -
+                    <span th:text="${exp.fechaHasta}"></span>
+                  </p>
+
+                  <p class="mb-0">
+                    <strong>Descripción:</strong><br />
+                    <span th:text="${exp.descripcion}"></span>
+                  </p>
+                </div>
+              </div>
+
+              <!-- MODO EDICIÓN -->
+              <div
+                id="experienciasContainer"
+                th:if="${soloLectura == null or !soloLectura}"
+              >
+                <div
+                  th:each="exp, stat : *{experienciaLaboral}"
+                  class="experiencia-card border rounded p-4 mb-3 bg-white position-relative"
+                >
+                  <h6 class="fw-semibold text-secondary mb-3">
+                    <i class="bi bi-award-fill me-1 text-dark"></i>
+                    [[${exp.puesto}]]
+                  </h6>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Empresa *</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:field="*{experienciaLaboral[__${stat.index}__].empresa}"
+                      required
+                      th:attr="readonly=${soloLectura}"
+                    />
+                    <div
+                      class="text-danger"
+                      th:errors="*{experienciaLaboral[__${stat.index}__].empresa}"
+                    ></div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Puesto *</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:field="*{experienciaLaboral[__${stat.index}__].puesto}"
+                      required
+                      th:attr="readonly=${soloLectura}"
+                    />
+                    <div
+                      class="text-danger"
+                      th:errors="*{experienciaLaboral[__${stat.index}__].puesto}"
+                    ></div>
+                  </div>
+
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Desde</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        th:field="*{experienciaLaboral[__${stat.index}__].fechaDesde}"
+                        placeholder="MM/YYYY"
+                        pattern="^(0[1-9]|1[0-2])/\d{4}$"
+                        required
+                        th:attr="readonly=${soloLectura}"
+                      />
+                      <div
+                        class="text-danger"
+                        th:errors="*{experienciaLaboral[__${stat.index}__].fechaDesde}"
+                      ></div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Hasta</label>
+                      <input
+                        type="text"
+                        class="form-control fecha-hasta"
+                        th:field="*{experienciaLaboral[__${stat.index}__].fechaHasta}"
+                        placeholder="MM/YYYY o 'Actualidad'"
+                        pattern="^(0[1-9]|1[0-2])/\d{4}$|^Actualidad$"
+                        th:attr="readonly=${soloLectura}"
+                      />
+                      <div
+                        class="text-danger"
+                        th:errors="*{experienciaLaboral[__${stat.index}__].fechaHasta}"
+                      ></div>
+                    </div>
+
+                    <div class="col-12">
+                      <div
+                        class="form-check mt-2"
+                        sec:authorize="hasRole('FREELANCER')"
+                      >
+                        <input
+                          class="form-check-input check-actualidad"
+                          type="checkbox"
+                          onchange="toggleActualidad(this)"
+                        />
+                        <label class="form-check-label"
+                          >Actualmente trabajo aquí</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Descripción</label>
+                    <textarea
+                      class="form-control"
+                      rows="3"
+                      th:field="*{experienciaLaboral[__${stat.index}__].descripcion}"
+                      placeholder="Describe tus responsabilidades, logros o proyectos clave..."
+                      th:attr="readonly=${soloLectura}"
+                    ></textarea>
+                    <div
+                      class="text-danger"
+                      th:errors="*{experienciaLaboral[__${stat.index}__].descripcion}"
+                    ></div>
+                  </div>
+
+                  <!-- Botones solo para FREELANCER -->
+                  <div class="text-end" sec:authorize="hasRole('FREELANCER')">
+                    <button
+                      type="button"
+                      class="btn btn-outline-dark btn-sm me-2"
+                      onclick="editarExperiencia(this)"
+                      title="Editar esta experiencia"
+                    >
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm"
+                      onclick="eliminarExperiencia(this)"
+                      title="Eliminar esta experiencia"
+                    >
+                      <i class="bi bi-trash-fill"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botón para agregar nueva experiencia: solo FREELANCER -->
+              <div class="text-end mt-3" sec:authorize="hasRole('FREELANCER')">
+                <button
+                  type="button"
+                  class="btn btn-outline-dark"
+                  onclick="agregarExperiencia()"
+                >
+                  <i class="bi bi-plus-circle"></i> Agregar experiencia
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- IDIOMAS -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-body">
+              <h5
+                class="card-title fw-bold text-dark d-flex align-items-center mb-3"
+              >
+                <span
+                  class="d-inline-flex align-items-center justify-content-center rounded-3 me-2"
+                  style="width: 40px; height: 40px; background-color: #cce5ff"
+                >
+                  <i class="bi bi-translate fs-5 text-primary"></i>
+                </span>
+                Idiomas
+              </h5>
+
+              <div id="idiomasContainer">
+                <!-- MODO SOLO LECTURA -->
+<div th:if="${soloLectura != null and soloLectura}">
+                  <div
+                    th:each="idioma : *{idiomas}"
+                    class="border rounded p-3 mb-2 bg-light"
+                  >
+                    <div class="row">
+                      <div class="col-md-6">
+                        <span class="fw-semibold">Idioma:</span>
+                        <span th:text="${idioma.nombre}" class="ms-1"></span>
+                      </div>
+                      <div class="col-md-6">
+                        <span class="fw-semibold">Nivel:</span>
+                        <span
+                          th:if="${idioma.nivel != null}"
+                          th:text="${#strings.capitalize(#strings.replace(idioma.nivel.name(), '_', ' '))}"
+                        ></span>
+                        <span th:if="${idioma.nivel == null}">-</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- MODO EDICIÓN -->
+                <div th:if="${soloLectura == null or !soloLectura}">
+                  <div
+                    th:each="idioma, stat : *{idiomas}"
+                    class="idioma-item border rounded p-3 mb-2 bg-light"
+                  >
+                    <div class="row g-3 align-items-center">
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Idioma</label>
+                        <select
+                          class="form-select"
+                          th:field="*{idiomas[__${stat.index}__].nombre}"
+                          required
+                        >
+                          <option value="">Seleccione un idioma</option>
+                          <option value="Español">Español</option>
+                          <option value="Inglés">Inglés</option>
+                          <option value="Francés">Francés</option>
+                          <option value="Portugués">Portugués</option>
+                          <option value="Alemán">Alemán</option>
+                          <option value="Italiano">Italiano</option>
+                          <option value="Chino">Chino</option>
+                          <option value="Japonés">Japonés</option>
+                          <option value="Ruso">Ruso</option>
+                        </select>
+                        <div
+                          class="text-danger"
+                          th:errors="*{idiomas[__${stat.index}__].nombre}"
+                        ></div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Nivel</label>
+                        <select
+                          class="form-select"
+                          th:field="*{idiomas[__${stat.index}__].nivel}"
+                          required
+                        >
+                          <option value="">Selecciona nivel</option>
+                          <option th:value="A1_PRINCIPIANTE">
+                            A1 - Principiante
+                          </option>
+                          <option th:value="A2_BASICO">A2 - Básico</option>
+                          <option th:value="B1_INTERMEDIO_BAJO">
+                            B1 - Intermedio bajo
+                          </option>
+                          <option th:value="B2_INTERMEDIO_ALTO">
+                            B2 - Intermedio alto
+                          </option>
+                          <option th:value="C1_AVANZADO">C1 - Avanzado</option>
+                          <option th:value="C2_EXPERTO">C2 - Experto</option>
+                          <option th:value="BASICO">Básico</option>
+                          <option th:value="INTERMEDIO">Intermedio</option>
+                          <option th:value="AVANZADO">Avanzado</option>
+                          <option th:value="NATIVO">Nativo</option>
+                        </select>
+                        <div
+                          class="text-danger"
+                          th:errors="*{idiomas[__${stat.index}__].nivel}"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botón para agregar idioma -->
+              <div
+                class="text-end"
+                th:if="${soloLectura == null or !soloLectura}"
+              >
+                <button
+                  type="button"
+                  id="agregarIdioma"
+                  class="btn btn-outline-dark"
+                >
+                  <i class="bi bi-plus-circle"></i> Agregar idioma
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TELÉFONO -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-body">
+              <h5
+                class="card-title fw-bold text-dark d-flex align-items-center mb-3"
+              >
+                <span
+                  class="d-inline-flex align-items-center justify-content-center rounded-3 me-2"
+                  style="width: 40px; height: 40px; background-color: #e2f0ff"
+                >
+                  <i class="bi bi-telephone-fill text-primary fs-5"></i>
+                </span>
+                Teléfono
+              </h5>
+
+              <!-- MODO EDICIÓN -->
+              <div th:if="${soloLectura == null or !soloLectura}">
+                <input
+                  type="text"
+                  class="form-control"
+                  th:field="*{telefono}"
+                  placeholder="Ejemplo: +51 987654321"
+                  pattern="^(\+\d{1,3}( )?)?\d{6,14}$"
+                  title="Número válido entre 6 y 14 dígitos, con o sin código internacional"
+                  required
+                  th:readonly="${soloLectura}"
+                />
+                <div class="text-danger" th:errors="*{telefono}"></div>
+              </div>
+
+              <!-- MODO SOLO LECTURA -->
+              <div th:if="${soloLectura != null and soloLectura}">
+                <input
+                  type="text"
+                  class="form-control"
+                  th:value="*{telefono}"
+                  placeholder="Ejemplo: +51 987654321"
+                  readonly
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- NIVEL ACADÉMICO -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-body">
+              <h5 class="card-title fw-bold text-dark mb-3">
+                <i class="bi bi-mortarboard-fill me-2 text-secondary"></i>
+                Nivel Académico
+              </h5>
+
+              <!-- MODO SOLO LECTURA -->
+              <div th:if="${soloLectura != null and soloLectura}">
+                <div class="border rounded p-3 bg-light">
+                  <span class="fw-semibold">Nivel:</span>
+                  <span th:text="*{nivelEstudios}" class="ms-1"></span>
+                </div>
+              </div>
+
+              <!-- MODO EDICIÓN -->
+              <div th:if="${soloLectura == null or !soloLectura}">
+                <select
+                  class="form-select"
+                  th:field="*{nivelEstudios}"
+                  required
+                >
+                  <option value="">Selecciona tu nivel</option>
+                  <option
+                    value="Secundaria"
+                    th:selected="${nivelEstudios == 'Secundaria'}"
+                  >
+                    Secundaria
+                  </option>
+                  <option
+                    value="Técnico"
+                    th:selected="${nivelEstudios == 'Técnico'}"
+                  >
+                    Técnico
+                  </option>
+                  <option
+                    value="Universitario"
+                    th:selected="${nivelEstudios == 'Universitario'}"
+                  >
+                    Universitario
+                  </option>
+                  <option
+                    value="Postgrado"
+                    th:selected="${nivelEstudios == 'Postgrado'}"
+                  >
+                    Postgrado
+                  </option>
+                </select>
+                <div class="text-danger" th:errors="*{nivelEstudios}"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HABILIDADES TÉCNICAS -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-body">
+              <h5 class="card-title fw-bold text-dark mb-3">
+                <i class="bi bi-tools me-2 text-dark"></i>
+                Habilidades Técnicas
+              </h5>
+
+              <!-- MODO SOLO LECTURA -->
+              <div th:if="${soloLectura != null and soloLectura}">
+                <div
+                  th:each="habilidad : *{habilidadesTecnicas}"
+                  class="border rounded p-3 mb-2 bg-light"
+                >
+                  <div class="row">
+                    <div class="col-md-6">
+                      <span class="fw-semibold">Habilidad:</span>
+                      <span th:text="${habilidad.nombre}" class="ms-1"></span>
+                    </div>
+                    <div class="col-md-6">
+                      <span class="fw-semibold">Nivel:</span>
+                      <span th:text="${habilidad.nivel}" class="ms-1"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- MODO EDICIÓN -->
+              <div
+                id="habilidadesContainer"
+                th:if="${soloLectura == null or !soloLectura}"
+              >
+                <div
+                  th:each="habilidad, stat : *{habilidadesTecnicas}"
+                  class="habilidad-item border rounded p-3 mb-2"
+                >
+                  <div class="row g-2 align-items-center">
+                    <div class="col-md-6">
+                      <label class="form-label">Habilidad</label>
+                      <select
+                        class="form-select"
+                        th:field="*{habilidadesTecnicas[__${stat.index}__].nombre}"
+                        required
+                      >
+                        <option value="">Selecciona una habilidad</option>
+                        <option
+                          th:each="h : ${habilidadesDisponibles}"
+                          th:value="${h}"
+                          th:text="${h}"
+                        ></option>
+                      </select>
+                      <div
+                        class="text-danger"
+                        th:errors="*{habilidadesTecnicas[__${stat.index}__].nombre}"
+                      ></div>
+                    </div>
+
+                    <div class="col-md-5">
+                      <label class="form-label">Nivel</label>
+                      <select
+                        class="form-select"
+                        th:field="*{habilidadesTecnicas[__${stat.index}__].nivel}"
+                        required
+                      >
+                        <option value="">Seleccione nivel</option>
+                        <option value="Básico">Básico</option>
+                        <option value="Intermedio">Intermedio</option>
+                        <option value="Avanzado">Avanzado</option>
+                        <option value="Experto">Experto</option>
+                      </select>
+                      <div
+                        class="text-danger"
+                        th:errors="*{habilidadesTecnicas[__${stat.index}__].nivel}"
+                      ></div>
+                    </div>
+
+                    <div class="col-md-1 text-end">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-danger eliminarHabilidad"
+                      >
+                        <i class="bi bi-x-lg"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botón para agregar nueva habilidad -->
+              <div
+                class="text-end"
+                th:if="${soloLectura == null or !soloLectura}"
+              >
+                <button
+                  type="button"
+                  id="agregarHabilidad"
+                  class="btn btn-outline-dark mt-2"
+                >
+                  <i class="bi bi-plus-circle"></i> Agregar Habilidad
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CATEGORÍAS -->
+          <div
+            class="card shadow-sm mb-4"
+            th:if="${soloLectura == null or soloLectura == false}"
+          >
+            <div class="card-body">
+              <h5 class="card-title fw-bold text-dark mb-3">
+                <i class="bi bi-tags-fill me-2 text-warning"></i>
+                Categorías de Interés (máx. 3)
+              </h5>
+
+              <div class="d-flex flex-wrap gap-2">
+                <div
+                  class="form-check px-3 py-2 border rounded-pill bg-light d-flex align-items-center"
+                  th:each="cat : ${categorias}"
+                >
                   <input
-                    class="form-check-input categoria-check"
+                    class="form-check-input me-2 categoria-check"
                     type="checkbox"
                     th:id="'cat-' + ${cat.idCategoria}"
+                    th:name="categorias"
                     th:value="${cat.idCategoria}"
-                    th:field="*{categorias}"
+                    th:checked="${freelancer.categorias != null and freelancer.categorias.contains(cat)}"
                   />
                   <label
                     class="form-check-label"
                     th:for="'cat-' + ${cat.idCategoria}"
-                    th:text="${cat.nombre}"
+                    th:text="${#strings.capitalize(#strings.replace(cat.nombre.toLowerCase(), '_', ' '))}"
                   ></label>
                 </div>
               </div>
-            </div>
-            <div
-              class="error-msg"
-              th:if="${#fields.hasErrors('categorias')}"
-              th:errors="*{categorias}"
-            ></div>
-          </div>
 
-          <!-- Portafolio -->
-          <div class="mb-3">
-            <label class="form-label">Enlace a portafolio (opcional)</label>
-            <input
-              type="text"
-              th:field="*{portafolio}"
-              class="form-control"
-              placeholder="https://..."
-            />
-            <div
-              class="error-msg"
-              th:if="${#fields.hasErrors('portafolio')}"
-              th:errors="*{portafolio}"
-            ></div>
-          </div>
-
-          <!-- Teléfono -->
-          <div class="mb-3">
-            <label class="form-label">Teléfono (opcional)</label>
-            <input type="text" th:field="*{telefono}" class="form-control" />
-            <div
-              class="error-msg"
-              th:if="${#fields.hasErrors('telefono')}"
-              th:errors="*{telefono}"
-            ></div>
-          </div>
-
-          <!-- Nivel de Estudios -->
-          <div class="mb-3">
-            <label class="form-label">Nivel de estudios *</label>
-            <select th:field="*{nivelEstudios}" class="form-select" required>
-              <option value="" disabled selected>
-                Selecciona tu nivel de estudios
-              </option>
-              <option value="Licenciatura">Licenciatura</option>
-              <option value="Maestría">Maestría</option>
-              <option value="Doctorado">Doctorado</option>
-              <option value="Secundaria">Secundaria</option>
-              <option value="Técnico">Técnico</option>
-              <option value="Otros">Otros</option>
-            </select>
-            <div
-              class="error-msg"
-              th:if="${#fields.hasErrors('nivelEstudios')}"
-              th:errors="*{nivelEstudios}"
-            ></div>
-          </div>
-
-          <!-- LinkedIn -->
-          <div class="mb-3">
-            <label class="form-label"
-              >Enlace a tu perfil de LinkedIn (opcional)</label
-            >
-            <input
-              type="text"
-              th:field="*{linkedin}"
-              class="form-control"
-              placeholder="https://linkedin.com/in/..."
-            />
-            <div
-              class="error-msg"
-              th:if="${#fields.hasErrors('linkedin')}"
-              th:errors="*{linkedin}"
-            ></div>
-          </div>
-
-          <!-- Idiomas -->
-          <div class="mb-3">
-            <label class="form-label">Idiomas que manejas</label>
-            <div class="form-check" th:each="idioma : ${idiomasDisponibles}">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                th:field="*{idiomas}"
-                th:value="${idioma}"
-                th:id="'idioma-' + ${idioma}"
-              />
-              <label
-                class="form-check-label"
-                th:for="'idioma-' + ${idioma}"
-                th:text="${idioma}"
-              ></label>
-            </div>
-          </div>
-
-          <!-- Habilidades -->
-          <div class="mb-3">
-            <label class="form-label">Habilidades técnicas</label>
-            <div
-              class="form-check"
-              th:each="habilidad : ${habilidadesDisponibles}"
-            >
-              <input
-                class="form-check-input"
-                type="checkbox"
-                th:field="*{habilidades}"
-                th:value="${habilidad}"
-                th:id="'hab-' + ${habilidad}"
-              />
-              <label
-                class="form-check-label"
-                th:for="'hab-' + ${habilidad}"
-                th:text="${habilidad}"
-              ></label>
-            </div>
-          </div>
-
-          <!-- Habilidades Blandas -->
-          <div class="mb-3">
-            <label class="form-label">Habilidades blandas</label>
-            <div
-              class="form-check"
-              th:each="habilidadBlanda : ${habilidadesBlandasDisponibles}"
-            >
-              <input
-                class="form-check-input"
-                type="checkbox"
-                th:field="*{habilidades}"
-                th:value="${habilidadBlanda}"
-                th:id="'habBlanda-' + ${habilidadBlanda}"
-              />
-              <label
-                class="form-check-label"
-                th:for="'habBlanda-' + ${habilidadBlanda}"
-                th:text="${habilidadBlanda}"
-              ></label>
-            </div>
-          </div>
-
-          <!-- Experiencia Laboral -->
-          <div class="mb-3">
-            <label class="form-label">Experiencia Laboral</label>
-            <div id="experienciasContainer">
               <div
-                class="experiencia-item border rounded p-3 mb-3"
-                th:each="exp, stat : *{experienciaLaboral}"
+                class="text-danger mt-2"
+                th:if="${#fields.hasErrors('categorias')}"
+                th:errors="*{categorias}"
+              ></div>
+
+              <small class="text-muted mt-2 d-block">
+                Solo puedes elegir hasta 3 categorías.
+              </small>
+            </div>
+          </div>
+
+          <!-- ENLACES OPCIONALES -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">Enlaces (Opcionales)</label>
+
+            <!--  Modo SOLO LECTURA -->
+            <div th:if="${soloLectura != null and soloLectura}">
+              <div
+                th:if="${freelancer.linkedin != null and !#strings.isEmpty(freelancer.linkedin)}"
+                class="d-flex align-items-center mb-2"
               >
-                <div class="mb-2">
-                  <label class="form-label">Empresa *</label>
-                  <input
-                    type="text"
-                    th:field="*{experienciaLaboral[__${stat.index}__].empresa}"
-                    class="form-control"
-                  />
-                </div>
-                <div class="mb-2">
-                  <label class="form-label">Puesto *</label>
-                  <input
-                    type="text"
-                    th:field="*{experienciaLaboral[__${stat.index}__].puesto}"
-                    class="form-control"
-                  />
-                </div>
-                <div class="mb-2">
-                  <label class="form-label">Periodo *</label>
-                  <input
-                    type="month"
-                    th:field="*{experienciaLaboral[__${stat.index}__].periodo}"
-                    class="form-control"
-                    required
-                  />
-                </div>
-                <div class="mb-2">
-                  <label class="form-label">Descripción *</label>
-                  <textarea
-                    th:field="*{experienciaLaboral[__${stat.index}__].descripcion}"
-                    class="form-control"
-                    rows="2"
-                  ></textarea>
-                </div>
+                <i class="bi bi-linkedin text-primary me-2 fs-5"></i>
+                <a
+                  th:href="${freelancer.linkedin}"
+                  class="text-decoration-none text-dark link-hover"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  th:text="${freelancer.linkedin}"
+                ></a>
+              </div>
+
+              <div
+                th:if="${freelancer.portafolio != null and !#strings.isEmpty(freelancer.portafolio)}"
+                class="d-flex align-items-center"
+              >
+                <i class="bi bi-briefcase-fill text-secondary me-2 fs-5"></i>
+                <a
+                  th:href="${freelancer.portafolio}"
+                  class="text-decoration-none text-dark link-hover"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  th:text="${freelancer.portafolio}"
+                ></a>
               </div>
             </div>
-            <button
-              type="button"
-              class="btn btn-outline-primary"
-              onclick="agregarExperiencia()"
-            >
-              Agregar experiencia
-            </button>
+
+            <!-- Modo EDICIÓN -->
+            <div th:if="${soloLectura == null or !soloLectura}">
+              <input
+                type="url"
+                class="form-control mb-2"
+                th:field="*{linkedin}"
+                placeholder="Perfil de LinkedIn"
+              />
+              <div class="text-danger" th:errors="*{linkedin}"></div>
+
+              <input
+                type="url"
+                class="form-control"
+                th:field="*{portafolio}"
+                placeholder="Portafolio (Dribbble, Behance, etc.)"
+              />
+              <div class="text-danger" th:errors="*{portafolio}"></div>
+            </div>
           </div>
 
-          <!-- Botones -->
-          <div class="d-flex justify-content-between mt-4">
+          <!-- FORMULARIO CURRICULUM-->
+
+          <!-- BOTONES: modo edición (freelancer) -->
+          <div
+            class="d-flex justify-content-between mt-4"
+            th:if="${soloLectura == null or soloLectura == false}"
+          >
             <button
               type="button"
               class="btn btn-outline-secondary"
@@ -382,66 +849,47 @@
             >
               ← Volver
             </button>
-            <button type="submit" class="btn btn-dark btn-sm">
-              Guardar Perfil
-            </button>
+            <button type="submit" class="btn btn-dark">Guardar Perfil</button>
+          </div>
+
+          <!-- BOTÓN: solo lectura (empleador) -->
+          <div class="mt-4 text-end" th:if="${soloLectura}">
+            <a
+              th:href="@{/emple} + '#propuestas'"
+              class="btn btn-outline-secondary"
+              >← Volver</a
+            >
           </div>
         </form>
       </div>
+
+      <div
+        id="fadeOverlay"
+        style="
+          position: fixed;
+          inset: 0;
+          background: white;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.7s;
+        "
+      ></div>
+
+      <div
+        id="toastContainer"
+        class="toast-container position-fixed bottom-0 end-0 p-3"
+        style="z-index: 9999"
+      ></div>
+
+      <script th:src="@{/js/perfil.js}"></script>
     </div>
-
-    <div
-      id="fadeOverlay"
-      style="
-        position: fixed;
-        inset: 0;
-        background: white;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.7s;
-      "
-    ></div>
-
-    <div
-      id="toastContainer"
-      class="toast-container position-fixed bottom-0 end-0 p-3"
-      style="z-index: 9999"
-    ></div>
-
-    <script th:src="@{/js/perfil.js}"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        let experienciaIndex =
-          document.querySelectorAll(".experiencia-item").length;
-
-        window.agregarExperiencia = function () {
-          const container = document.getElementById("experienciasContainer");
-
-          const div = document.createElement("div");
-          div.className = "experiencia-item border rounded p-3 mb-3";
-          div.innerHTML = `
-        <div class="mb-2">
-          <label class="form-label">Empresa *</label>
-          <input type="text" name="experienciaLaboral[${experienciaIndex}].empresa" class="form-control" required />
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Puesto *</label>
-          <input type="text" name="experienciaLaboral[${experienciaIndex}].puesto" class="form-control" required />
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Periodo *</label>
-          <input type="text" name="experienciaLaboral[${experienciaIndex}].periodo" class="form-control" required />
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Descripción *</label>
-          <textarea name="experienciaLaboral[${experienciaIndex}].descripcion" class="form-control" rows="2" required></textarea>
-        </div>
-      `;
-
-          container.appendChild(div);
-          experienciaIndex++;
-        };
-      });
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      const cvProcesado = /*[[${cvProcesado}]]*/ false;
+      const modoEdicion = /*[[${modoEdicion}]]*/ false;
+      const soloLectura = /*[[${soloLectura}]]*/ false;
+      const habilidadesDisponibles = /*[[${habilidadesDisponibles}]]*/ [];
+      /*]]>*/
     </script>
   </body>
 </html>

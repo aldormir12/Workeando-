@@ -1,17 +1,16 @@
 package com.workeando.plataform.controller;
 
+import com.workeando.plataform.service.ProyectoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.workeando.plataform.service.impl.ProyectoServiceImpl;
-
 @Controller
 public class HomeController {
 
-    private final ProyectoServiceImpl proyectoService;
+    private final ProyectoService proyectoService;
 
-    public HomeController(ProyectoServiceImpl proyectoService) {
+    public HomeController(ProyectoService proyectoService) {
         this.proyectoService = proyectoService;
     }
 

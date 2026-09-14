@@ -3,13 +3,14 @@ package com.workeando.plataform.controller;
 import com.workeando.plataform.model.Postulacion;
 import com.workeando.plataform.model.Proyecto;
 import com.workeando.plataform.repository.PostulacionRepository;
-import com.workeando.plataform.service.impl.CategoriaServiceImpl;
-import com.workeando.plataform.service.impl.ProyectoServiceImpl;
+import com.workeando.plataform.service.CategoriaService;
+import com.workeando.plataform.service.PostulacionService;
+import com.workeando.plataform.service.ProyectoService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication; //info del usuario autenticado
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,62 +22,48 @@ import java.util.Map;
 @Controller
 public class EmpleadorController {
 
-    private final ProyectoServiceImpl proyectoService;
+    private final ProyectoService proyectoService;
     private final PostulacionRepository postulacionRepository;
-    private final CategoriaServiceImpl categoriaService;
+    private final CategoriaService categoriaService;
+    private final PostulacionService postulacionService;
 
-    public EmpleadorController(ProyectoServiceImpl proyectoService, PostulacionRepository postulacionRepository, CategoriaServiceImpl categoriaService) {
+    @Autowired
+    public EmpleadorController(ProyectoService proyectoService, PostulacionRepository postulacionRepository,
+            CategoriaService categoriaService, PostulacionService postuuService) {
         this.proyectoService = proyectoService;
         this.postulacionRepository = postulacionRepository;
         this.categoriaService = categoriaService;
+        this.postulacionService = postuuService;
+
     }
 
-    // Vista principal del empleador con sus proyectos paginados
+    // Vista principal del empleador con sus proyectos
     @GetMapping("/emple")
-    public String empleadorPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "fechaPublicacion") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDirection,
-            Model model, 
-            Authentication authentication) {
-        
+    public String empleadorPage(Model model,
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") int pageProyectos,
+            @RequestParam(defaultValue = "0") int pagePostulaciones) {
+
         String correo = authentication.getName();
+
         model.addAttribute("proyecto", new Proyecto());
 
-        // Configurar paginación y ordenamiento
-        Sort sort = sortDirection.equalsIgnoreCase("desc") ? 
-                   Sort.by(sortBy).descending() : 
-                   Sort.by(sortBy).ascending();
-        
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageableProyectos = PageRequest.of(pageProyectos, 5);
+        Pageable pageablePostulaciones = PageRequest.of(pagePostulaciones, 5);
 
-        // proyectos creados por este empleador con paginación
-        Page<Proyecto> proyectosPage = proyectoService.listarTodosPorCorreoPaginado(correo, pageable);
-        
-        model.addAttribute("proyectosPage", proyectosPage);
+        Page<Proyecto> proyectosPage = proyectoService.listarPorCorreoPaginado(correo, pageableProyectos);
+        Page<Postulacion> postulacionesPage = postulacionService.listarPostulacionesPorCreadorCorreo(correo,
+                pageablePostulaciones);
+
         model.addAttribute("proyectos", proyectosPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", proyectosPage.getTotalPages());
-        model.addAttribute("totalElements", proyectosPage.getTotalElements());
-        model.addAttribute("size", size);
-        model.addAttribute("sortBy", sortBy);
-        model.addAttribute("sortDirection", sortDirection);
-        
-        // Calcular rango de páginas para mostrar en la paginación
-        int startPage = Math.max(0, page - 2);
-        int endPage = Math.min(proyectosPage.getTotalPages() - 1, page + 2);
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("endPage", endPage);
+        model.addAttribute("proyectosPage", proyectosPage);
 
-        // postulaciones recibidas
-        List<Postulacion> postulaciones = postulacionRepository.findByProyectoCreadorCorreo(correo);
-        model.addAttribute("postulaciones", postulaciones);
+        model.addAttribute("postulaciones", postulacionesPage.getContent());
+        model.addAttribute("postulacionesPage", postulacionesPage);
 
-        //agregar categorias al modelo 
         model.addAttribute("categorias", categoriaService.listarTodas());
 
-        return "emple"; // Vista principal del empleador
+        return "emple";
     }
 
     // Publicar un nuevo proyecto
@@ -112,7 +99,7 @@ public class EmpleadorController {
         return Map.of("nuevoEstado", proyecto.getEstado());
     }
 
-    // Eliminar proyecto 
+    // Eliminar proyecto
     @PostMapping("/empleador/eliminarProyecto/{id}")
     @ResponseBody
     public Map<String, Object> eliminarProyecto(@PathVariable Long id) {

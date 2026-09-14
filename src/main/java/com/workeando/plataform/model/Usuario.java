@@ -1,6 +1,13 @@
 package com.workeando.plataform.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -47,7 +54,7 @@ public class Usuario {
     public Usuario(String nombre, String correo, String contrasena, Rol rol) {
         this.nombre = nombre;
         this.correo = correo;
-        setContrasena(contrasena);
+        //setContrasena(contrasena);
         this.rol = rol;
     }
 

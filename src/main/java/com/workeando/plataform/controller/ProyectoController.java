@@ -1,8 +1,7 @@
 package com.workeando.plataform.controller;
 
 import com.workeando.plataform.model.Proyecto;
-import com.workeando.plataform.service.impl.ProyectoServiceImpl;
-
+import com.workeando.plataform.service.ProyectoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,10 +15,10 @@ import java.util.Optional;
 @RequestMapping("/proyectos/empleador")
 public class ProyectoController {
 
-    private final ProyectoServiceImpl proyectoService;
+    private final ProyectoService proyectoService;
 
     @Autowired
-    public ProyectoController(ProyectoServiceImpl proyectoService) {
+    public ProyectoController(ProyectoService proyectoService) {
         this.proyectoService = proyectoService;
     }
 
@@ -40,7 +39,34 @@ public class ProyectoController {
         }
 
         model.addAttribute("proyectos", proyectos);
-        return "free"; 
+        return "free";
+    }
+
+    // Método para filtrar proyectos por categoría
+    @GetMapping("/filtrar")
+    @ResponseBody // Esto asegura que la respuesta se devuelva como JSON
+    public List<Proyecto> filtrarProyectosPorCategoria(@RequestParam("categoriaId") Long categoriaId) {
+        List<Proyecto> proyectos;
+        if (categoriaId != null && categoriaId > 0) {
+            proyectos = proyectoService.listarPorCategoria(categoriaId); // Llamada al servicio para obtener proyectos
+                                                                         // por categoría
+        } else {
+            proyectos = proyectoService.listarTodos(); // Si no hay filtro, mostrar todos los proyectos
+        }
+
+        // Aquí puedes formatear las fechas si lo deseas, pero ahora devuelves JSON
+        // directamente
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        for (Proyecto proyecto : proyectos) {
+            if (proyecto.getFechaInicio() != null) {
+                proyecto.setFechaInicioFormateada(proyecto.getFechaInicio().format(formatter));
+            }
+            if (proyecto.getFechaFinal() != null) {
+                proyecto.setFechaFinalFormateada(proyecto.getFechaFinal().format(formatter));
+            }
+        }
+
+        return proyectos; // Devuelve los proyectos como JSON
     }
 
     @PostMapping("/crear")
@@ -50,7 +76,8 @@ public class ProyectoController {
         model.addAttribute("registroExitoso", true);
         return "redirect:/emple";
     }
-    //se muestran los proyectos en formato json
+
+    // se muestran los proyectos en formato json
     @GetMapping("/api")
     @ResponseBody
     public List<Proyecto> listarProyectos() {

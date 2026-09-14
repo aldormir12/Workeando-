@@ -13,10 +13,24 @@ public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCategoria;
-
     // Nombre único y obligatorio de la categoría
     @Column(nullable = false, unique = true)
     private String nombre;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Categoria categoria = (Categoria) o;
+        return idCategoria != null && idCategoria.equals(categoria.getIdCategoria());
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(idCategoria);
+    }
 
     // Relación con proyectos (unidireccional desde Proyecto)
     @OneToMany(mappedBy = "categoria")
@@ -29,7 +43,8 @@ public class Categoria {
     private List<Freelancer> freelancers;
 
     // Constructor vacío
-    public Categoria() {}
+    public Categoria() {
+    }
 
     // Constructor con nombre
     public Categoria(String nombre) {

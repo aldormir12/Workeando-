@@ -2,20 +2,31 @@ package com.workeando.plataform.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Pattern;
-
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "proyectos")
@@ -73,6 +84,10 @@ public class Proyecto {
 
     @Transient
     private String fechaFinalFormateada;
+
+    @ManyToOne
+    @JoinColumn(name = "idEmpleador")
+    private Empleador empleador;
 
     public Proyecto() {
     }
@@ -161,6 +176,10 @@ public class Proyecto {
     @JsonManagedReference
     private List<Postulacion> postulaciones;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado_proyecto", nullable = false)
+    private EstadoProyecto estadoProyecto = EstadoProyecto.PUBLICADO;
+
     public List<Postulacion> getPostulaciones() {
         return postulaciones;
     }
@@ -209,6 +228,7 @@ public class Proyecto {
         this.presupuesto = presupuesto;
     }
 
+    // ACTIVACION Y DESACTIVACION DE UN PROYECTO
     public String getEstado() {
         return estado;
     }
@@ -225,6 +245,15 @@ public class Proyecto {
         this.creadorCorreo = creadorCorreo;
     }
 
+    // ESTADO DEL ENUM, ESTADO OFICIAL DE UN PROYECTO
+    public EstadoProyecto getEstadoProyecto() {
+        return estadoProyecto;
+    }
+
+    public void setEstadoProyecto(EstadoProyecto estadoProyecto) {
+        this.estadoProyecto = estadoProyecto;
+    }
+
     @AssertTrue(message = "Las fechas deben estar entre hoy y un año a partir de hoy, y la final debe ser posterior a la inicio")
     public boolean isRangoFechasValido() {
         if (fechaInicio == null || fechaFinal == null)
@@ -239,18 +268,5 @@ public class Proyecto {
                 !fechaFinal.isAfter(maxFecha) &&
                 fechaFinal.isAfter(fechaInicio);
     }
-
-    @ManyToOne
-    @JoinColumn(name = "empleador_id") 
-    private Empleador empleador;
-
-    public Empleador getEmpleador() {
-        return empleador;
-    }
-
-    public void setEmpleador(Empleador empleador) {
-        this.empleador = empleador;
-    }
-    
 
 }

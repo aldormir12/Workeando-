@@ -1,19 +1,47 @@
 package com.workeando.plataform.service;
 
+import com.workeando.plataform.model.Usuario;
+import com.workeando.plataform.repository.UsuarioRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import java.util.List;
 import java.util.Optional;
 
-import com.workeando.plataform.model.Usuario;
+@Service
+public class UsuarioService {
 
-public interface UsuarioService {
+    private final UsuarioRepository usuarioRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    List<Usuario> listarTodos();
+    //constructor
+    public UsuarioService(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = new BCryptPasswordEncoder();
 
-    Optional<Usuario> buscarPorId(Long id);
+    }
 
-    Usuario registrar(Usuario usuario);
+    public List<Usuario> listarTodos() {
+        return usuarioRepository.findAll();
+    }
 
-    void eliminar(Long id);
+    public Optional<Usuario> buscarPorId(Long id) {
+        return usuarioRepository.findById(id);
+    }
 
-    Usuario buscarPorCorreo(String correo);
+    public Usuario registrar(Usuario usuario) {
+        // Codifica la contraseña antes de guardar
+        String rawPassword = usuario.getContrasena();//contraseña sin cifrar
+        usuario.setContrasena(passwordEncoder.encode(rawPassword));
+        return usuarioRepository.save(usuario);
+    }
+
+    public void eliminar(Long id) {
+        usuarioRepository.deleteById(id);
+    }
+
+    public Usuario buscarPorCorreo(String correo) {
+        return usuarioRepository.findByCorreo(correo)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + correo));
+    }
 }

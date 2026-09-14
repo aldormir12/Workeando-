@@ -1,9 +1,18 @@
 package com.workeando.plataform.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
 @Entity
+@Table(name = "chat")
 public class Chat {
 
     @Id
@@ -11,14 +20,24 @@ public class Chat {
     private Integer idMensaje;
 
     @ManyToOne
-    @JoinColumn(name = "Usuario_idUsuario")
+    @JoinColumn(name = "idUsuario", nullable = false)
     private Usuario usuario;
 
-    private Integer remitente_id;
-    private Integer destinatario_id;
+    @ManyToOne
+    @JoinColumn(name = "Remitente_id", nullable = false)
+    private Usuario remitente;
+
+    @ManyToOne
+    @JoinColumn(name = "Destinatario_id", nullable = false)
+    private Usuario destinatario;
+
+    @Column(columnDefinition = "TEXT")
     private String contenido;
+
+    @Column(name = "FechaEnvio")
     private LocalDateTime fechaEnvio;
 
+    // Getters y Setters
     public Integer getIdMensaje() {
         return idMensaje;
     }
@@ -35,20 +54,20 @@ public class Chat {
         this.usuario = usuario;
     }
 
-    public Integer getRemitente_id() {
-        return remitente_id;
+    public Usuario getRemitente() {
+        return remitente;
     }
 
-    public void setRemitente_id(Integer remitente_id) {
-        this.remitente_id = remitente_id;
+    public void setRemitente(Usuario remitente) {
+        this.remitente = remitente;
     }
 
-    public Integer getDestinatario_id() {
-        return destinatario_id;
+    public Usuario getDestinatario() {
+        return destinatario;
     }
 
-    public void setDestinatario_id(Integer destinatario_id) {
-        this.destinatario_id = destinatario_id;
+    public void setDestinatario(Usuario destinatario) {
+        this.destinatario = destinatario;
     }
 
     public String getContenido() {

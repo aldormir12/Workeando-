@@ -13,6 +13,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/notificacionFlotante.css}" />
   </head>
   <body>
     <!-- NAVBAR -->
@@ -27,9 +28,43 @@
           >Workeando</a
         >
         <div class="d-flex align-items-center gap-3">
-          <button type="button" class="btn btn-outline-dark btn-md px-4 ms-3">
-            Explora
-          </button>
+          <!-- Botón Ver perfil -->
+          <div th:if="${tienePerfil}" class="dropdown">
+            <button
+              class="btn btn-outline-dark btn-sm dropdown-toggle d-flex align-items-center gap-2 px-3"
+              type="button"
+              id="perfilDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              title="Opciones de perfil"
+            >
+              <i class="fas fa-user-circle"></i>
+              <span class="d-none d-sm-inline">Perfil</span>
+            </button>
+
+            <ul class="dropdown-menu" aria-labelledby="perfilDropdown">
+              <li>
+                <button
+                  class="dropdown-item d-flex align-items-center gap-2"
+                  type="button"
+                  data-bs-toggle="offcanvas"
+                  data-bs-target="#perfilOffcanvas"
+                  aria-controls="perfilOffcanvas"
+                >
+                  <i class="fas fa-id-card text-primary"></i> Ver perfil
+                </button>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-2"
+                  href="/free/mis-postulaciones"
+                >
+                  <i class="fas fa-clipboard-list text-secondary"></i> Mis
+                  postulaciones
+                </a>
+              </li>
+            </ul>
+          </div>
 
           <button
             type="button"
@@ -78,6 +113,24 @@
       </div>
     </section>
 
+<!-- Alerta cuando el freelancer tiene un perfil por defecto -->
+<div th:if="${esPerfilPorDefecto}" class="alert floating-alert alert-warning alert-dismissible fade show p-4 mb-4 rounded shadow-sm" style="background-color: #f8f9fa; border: 1px solid #ced4da;">
+  <div class="d-flex align-items-center">
+    <strong class="text-dark me-3">¡Atención!</strong>
+    <span th:text="${alertaPerfil}" class="text-muted"></span>
+  </div>
+
+  <!-- Botón de completar perfil -->
+  <a href="/free/perfil" class="btn btn-outline-primary btn-sm ms-3" style="border-color: #007bff; color: #007bff; padding-left: 12px; padding-right: 12px; font-size: 0.875rem; margin-top: 10px;">
+    Completa tu perfil
+  </a>
+
+  <!-- Botón de cierre -->
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+</div>
+
+
+
     <!-- PROYECTOS DISPONIBLES -->
     <section id="proyectos" class="py-5">
       <div class="container">
@@ -103,86 +156,121 @@
               </button>
               <ul class="dropdown-menu" aria-labelledby="dropdownCategoria">
                 <li>
-                  <a class="dropdown-item categoria-opcion" data-categoria=""
-                    >Todas las categorías</a
+                  <a
+                    class="dropdown-item categoria-opcion"
+                    data-categoria=""
+                    data-categoria-id="0"
                   >
+                    Todas las categorías
+                  </a>
                 </li>
                 <li>
                   <a
                     class="dropdown-item categoria-opcion"
                     data-categoria="Diseño"
-                    >Diseño</a
+                    data-categoria-id="1"
                   >
+                    Diseño
+                  </a>
                 </li>
                 <li>
                   <a
                     class="dropdown-item categoria-opcion"
                     data-categoria="Cocina y Gastronomía"
-                    >Cocina y Gastronomía</a
+                    data-categoria-id="2"
                   >
+                    Cocina y Gastronomía
+                  </a>
                 </li>
                 <li>
                   <a
                     class="dropdown-item categoria-opcion"
                     data-categoria="Marketing"
-                    >Marketing</a
+                    data-categoria-id="3"
                   >
+                    Marketing
+                  </a>
                 </li>
                 <li>
                   <a
                     class="dropdown-item categoria-opcion"
                     data-categoria="Redacción"
-                    >Redacción</a
+                    data-categoria-id="4"
                   >
+                    Redacción
+                  </a>
                 </li>
                 <li>
                   <a
                     class="dropdown-item categoria-opcion"
                     data-categoria="Traducción"
-                    >Traducción</a
+                    data-categoria-id="5"
                   >
+                    Traducción
+                  </a>
                 </li>
                 <li>
                   <a
                     class="dropdown-item categoria-opcion"
                     data-categoria="Animales"
-                    >Animales</a
+                    data-categoria-id="6"
                   >
+                    Animales
+                  </a>
                 </li>
                 <li>
                   <a
                     class="dropdown-item categoria-opcion"
                     data-categoria="Servicios generales"
-                    >Servicios generales</a
+                    data-categoria-id="7"
                   >
+                    Servicios generales
+                  </a>
                 </li>
                 <li>
                   <a
                     class="dropdown-item categoria-opcion"
                     data-categoria="Creativos y Arte"
-                    >Creativos y Arte</a
+                    data-categoria-id="8"
                   >
+                    Creativos y Arte
+                  </a>
                 </li>
                 <li>
                   <a
                     class="dropdown-item categoria-opcion"
                     data-categoria="Para turistas"
-                    >Para turistas</a
+                    data-categoria-id="9"
                   >
+                    Para turistas
+                  </a>
                 </li>
                 <li>
                   <a
                     class="dropdown-item categoria-opcion"
                     data-categoria="Logística y Operaciones"
-                    >Logística y Operaciones</a
+                    data-categoria-id="10"
                   >
+                    Logística y Operaciones
+                  </a>
                 </li>
                 <li>
                   <a
                     class="dropdown-item categoria-opcion"
                     data-categoria="Educación y Tutorías"
-                    >Educación y Tutorías</a
+                    data-categoria-id="11"
                   >
+                    Educación y Tutorías
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item categoria-opcion"
+                    data-categoria="Tecnología y Desarrollo"
+                    data-categoria-id="12"
+                  >
+                    Tecnología y Desarrollo
+                  </a>
                 </li>
               </ul>
             </div>
@@ -191,8 +279,6 @@
         <div id="contenedorProyectos"></div>
       </div>
     </section>
-
-    <div id="listaProyectos" class="list-group border-end"></div>
 
     <main class="container-fluid mt-4">
       <div class="row">
@@ -576,23 +662,29 @@
     ></div>
 
     <!-- PERFIL FREELANCER -->
-    <section class="py-5 bg-light text-center">
+    <section
+      class="py-5 bg-light text-center"
+      th:if="${!tienePerfil || esPerfilPorDefecto}"
+    >
       <div class="container">
-        <h2 class="fw-bold text-primary">
-          Crea tu perfil y empieza a trabajar
-        </h2>
+        <h2 class="fw-bold text-dark">Edita tu perfil y empieza a trabajar</h2>
         <p class="fw-semibold text-muted">
           Construye tu perfil para destacar tus habilidades y conseguir
           proyectos interesantes.
         </p>
 
+    
+        <!-- Botón único de acción -->
         <form th:action="@{/free/perfil}" method="get" style="display: inline">
-          <button type="submit" class="btn btn-primary btn-lg px-4 mt-3">
-            Crear perfil
+          <button type="submit" class="btn btn-dark btn-lg px-4 mt-3">
+            <span
+              th:text="${esPerfilPorDefecto ? 'Completar perfil' : 'Crear perfil'}"
+            ></span>
           </button>
         </form>
       </div>
     </section>
+
     <!-- Toast de Éxito -->
     <div
       aria-live="polite"
@@ -630,5 +722,178 @@
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script th:src="@{/js/free.js}"></script>
+
+    <!-- OFFCANVAS: PERFIL DEL FREELANCER -->
+    <div
+      class="offcanvas offcanvas-end"
+      tabindex="-1"
+      id="perfilOffcanvas"
+      aria-labelledby="perfilOffcanvasLabel"
+    >
+      <div class="offcanvas-header border-bottom">
+        <h5
+          class="offcanvas-title text-dark fw-semibold"
+          id="perfilOffcanvasLabel"
+        >
+          <i class="fas fa-user-circle me-2 text-secondary"></i> Mi Perfil
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+
+      <div class="offcanvas-body text-dark small" th:if="${freelancer != null}">
+        <!-- Información General -->
+        <section class="mb-4">
+          <h6
+            class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2"
+          >
+            Información general
+          </h6>
+          <dl class="row mb-0">
+            <dt class="col-4">
+              <i class="fas fa-phone-alt text-secondary me-2"></i>Teléfono
+            </dt>
+            <dd class="col-8" th:text="${freelancer.telefono}">-</dd>
+
+            <dt class="col-4">
+              <i class="fas fa-graduation-cap text-secondary me-2"></i>Estudios
+            </dt>
+            <dd class="col-8" th:text="${freelancer.nivelEstudios}">-</dd>
+
+            <dt class="col-4" th:if="${freelancer.linkedin}">
+              <i class="fab fa-linkedin text-secondary me-2"></i>LinkedIn
+            </dt>
+            <dd class="col-8" th:if="${freelancer.linkedin}">
+              <a
+                th:href="${freelancer.linkedin}"
+                target="_blank"
+                th:text="${freelancer.linkedin}"
+                class="text-decoration-none"
+                >Enlace</a
+              >
+            </dd>
+
+            <dt class="col-4" th:if="${freelancer.portafolio}">
+              <i class="fas fa-briefcase text-secondary me-2"></i>Portafolio
+            </dt>
+            <dd class="col-8" th:if="${freelancer.portafolio}">
+              <a
+                th:href="${freelancer.portafolio}"
+                target="_blank"
+                th:text="${freelancer.portafolio}"
+                class="text-decoration-none"
+                >Enlace</a
+              >
+            </dd>
+          </dl>
+        </section>
+
+        <!-- Categorías -->
+        <section
+          class="mb-4"
+          th:if="${freelancer.categorias != null and !freelancer.categorias.isEmpty()}"
+        >
+          <h6
+            class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2"
+          >
+            <i class="fas fa-tags text-secondary me-2"></i>Categorías
+          </h6>
+          <ul class="list-unstyled mb-0">
+            <li
+              th:each="cat : ${freelancer.categorias}"
+              th:text="${cat.nombre}"
+            ></li>
+          </ul>
+        </section>
+
+        <!-- Idiomas -->
+        <section
+          class="mb-4"
+          th:if="${freelancer.idiomas != null and !freelancer.idiomas.isEmpty()}"
+        >
+          <h6
+            class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2"
+          >
+            <i class="fas fa-language text-secondary me-2"></i>Idiomas
+          </h6>
+          <ul class="list-unstyled mb-0">
+            <li
+              th:each="idioma : ${freelancer.idiomas}"
+              th:text="${idioma.nombre + ' - ' + idioma.nivel}"
+            ></li>
+          </ul>
+        </section>
+
+        <!-- Habilidades técnicas -->
+        <section
+          class="mb-4"
+          th:if="${freelancer.habilidadesTecnicas != null and !freelancer.habilidadesTecnicas.isEmpty()}"
+        >
+          <h6
+            class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2"
+          >
+            <i class="fas fa-tools text-secondary me-2"></i>Habilidades técnicas
+          </h6>
+          <ul class="list-unstyled mb-0">
+            <li
+              th:each="hab : ${freelancer.habilidadesTecnicas}"
+              th:text="${hab.nombre + ' - ' + hab.nivel}"
+            ></li>
+          </ul>
+        </section>
+
+        <!-- Experiencia Laboral -->
+        <section
+          th:if="${freelancer.experienciaLaboral != null and !freelancer.experienciaLaboral.isEmpty()}"
+        >
+          <h6
+            class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2"
+          >
+            <i class="fas fa-briefcase text-secondary me-2"></i>Experiencia
+            laboral
+          </h6>
+          <div
+            th:each="exp : ${freelancer.experienciaLaboral}"
+            class="mb-3 pb-2 border-bottom"
+          >
+            <p class="mb-1 fw-semibold" th:text="${exp.puesto}">Puesto</p>
+            <p class="mb-1 text-muted small" th:text="${exp.empresa}">
+              Empresa
+            </p>
+            <p
+              class="mb-1 small"
+              th:text="${exp.fechaDesde + ' - ' + exp.fechaHasta}"
+            >
+              Fechas
+            </p>
+            <p class="mb-0 text-secondary small" th:text="${exp.descripcion}">
+              Descripción
+            </p>
+          </div>
+        </section>
+
+        <!-- Botón editar perfil -->
+        <div class="mt-4">
+          <a
+            href="/free/perfil?modoEdicion=true"
+            class="btn btn-outline-dark w-100 btn-sm"
+          >
+            <i class="fas fa-edit me-2"></i>Editar perfil
+          </a>
+        </div>
+      </div>
+
+      <!-- Si no hay perfil -->
+      <div
+        class="offcanvas-body text-muted small text-center"
+        th:if="${freelancer == null}"
+      >
+        <p>No se encontró información del perfil.</p>
+      </div>
+    </div>
   </body>
 </html>

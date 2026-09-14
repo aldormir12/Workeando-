@@ -1,17 +1,21 @@
-
-package com.workeando.plataform.service.impl;
+package com.workeando.plataform.serviceimpl;
 
 import com.workeando.plataform.model.Proyecto;
 import com.workeando.plataform.repository.ProyectoRepository;
+import com.workeando.plataform.service.ProyectoService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProyectoServiceImpl {
+public class ProyectoServiceImpl implements ProyectoService{
+    @Autowired
 
     private final ProyectoRepository proyectoRepository;
 
@@ -59,25 +63,21 @@ public class ProyectoServiceImpl {
         return proyectoRepository.findByCreadorCorreo(correo);
     }
 
-    // Método con misma lógica que listarPorCreador()
+    // Método con misma lógica que listarPorCreador(),
+
     public List<Proyecto> listarTodosPorCorreo(String correo) {
         return proyectoRepository.findByCreadorCorreo(correo);
     }
-
-    // NUEVOS MÉTODOS PARA PAGINACIÓN
-
-    // Listar proyectos por correo con paginación
-    public Page<Proyecto> listarTodosPorCorreoPaginado(String correo, Pageable pageable) {
+    // paginación
+ @Override
+    public Page<Proyecto> listarPorCorreoPaginado(String correo, Pageable pageable) {
         return proyectoRepository.findByCreadorCorreo(correo, pageable);
     }
 
-    // Listar todos los proyectos con paginación
-    public Page<Proyecto> listarTodosPaginado(Pageable pageable) {
-        return proyectoRepository.findAll(pageable);
-    }
 
-    // Listar proyectos por estado con paginación
-    public Page<Proyecto> listarPorEstadoPaginado(String estado, Pageable pageable) {
-        return proyectoRepository.findByEstado(estado, pageable);
+    // Filtrar proyectos por categoría (usando el ID de la categoría)
+    @Override
+    public List<Proyecto> listarPorCategoria(Long categoriaId) {
+        return proyectoRepository.findByCategoriaIdCategoria(categoriaId);  // Llamamos al método del repositorio
     }
 }

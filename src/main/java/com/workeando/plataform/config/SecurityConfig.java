@@ -14,24 +14,30 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http //rutas que no requieren login
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/usuarios/**", "/css/**", "/img/**", "/login", "/h2-console/**")
-                .permitAll()
-                .anyRequest().authenticated()
-            )
-            .formLogin(login -> login
-                .loginPage("/login")
-                .failureUrl("/login?error=true")
-                .permitAll()
-                .successHandler(customAuthenticationSuccessHandler()) // Handler redirije a la página segun los roles
-            )
-            .logout(logout -> logout 
-                .logoutSuccessUrl("/login?logout=true")//al cerrar sesion se redirige a la pagina del login
-                .permitAll()
-            )
-            .csrf(csrf -> csrf.disable())
-            .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+        http // rutas que no requieren login
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/usuarios/**", "/css/**", "/img/**", "/login", "/h2-console/**")
+                        .permitAll()
+
+                        .requestMatchers("/free**").hasRole("FREELANCER")
+                        .requestMatchers("/emple**").hasRole("EMPLEADOR")
+                        .anyRequest().authenticated())
+                .formLogin(login -> login
+                        .loginPage("/login")
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                        .successHandler(customAuthenticationSuccessHandler()) // Handler redirije a la página segun los
+                                                                              // roles
+                )
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/login?logout=true")// al cerrar sesion se redirige a la pagina del login
+                        .permitAll())
+
+                        //error de seguridad
+                .exceptionHandling(exception -> exception.accessDeniedPage("/error/403")
+                )
+                .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
 
         return http.build();
     }

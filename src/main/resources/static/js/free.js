@@ -13,38 +13,56 @@ function interpretarModalidadPago(valor) {
   }
 }
 
-// SECCIÓN: Filtro por categoría
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".categoria-opcion").forEach((item) => {
     item.addEventListener("click", function () {
-      const categoria = this.getAttribute("data-categoria") || "";
-      const categoriaTexto = categoria || "Filtrar por categorías";
+      const categoriaId = this.getAttribute("data-categoria-id");
+
+      // Verifica si categoriaId es válido
+      if (!categoriaId) {
+        console.error("categoriaId no es válido");
+        return;
+      }
+
+      const categoriaTexto =
+        this.getAttribute("data-categoria") || "Filtrar por categorías";
       document.getElementById("categoriaTexto").textContent = categoriaTexto;
 
-      fetch(`/api/proyectos?categoria=${encodeURIComponent(categoria)}`)
+      // Hacer fetch a la ruta del filtro
+      fetch(
+        `/proyectos/empleador/filtrar?categoriaId=${encodeURIComponent(
+          categoriaId
+        )}`
+      )
         .then((response) => response.json())
         .then((data) => {
           const lista = document.getElementById("listaProyectos");
           const panelDetalle = document.getElementById("panelDetalle");
           const contenido = document.getElementById("contenidoProyecto");
-          lista.innerHTML = "";
+          const panelIzquierdo = document.querySelector(".col-md-4"); // Panel izquierdo
+          lista.innerHTML = ""; // Limpiar la lista de proyectos
 
+          // Eliminar cualquier contenedor extra si existe
+          document.querySelectorAll('.extra-contenedor').forEach((el) => el.remove());
+
+          // Si no hay proyectos, mostrar mensaje y ocultar ambos paneles
           if (!data || data.length === 0) {
             lista.innerHTML = `
               <div class="d-flex flex-column justify-content-center align-items-center text-muted text-center" style="min-height: 300px;">
                 <p class="mb-0">
-                  No hay proyectos para la categoría <strong>${categoria}</strong>.
+                  No hay proyectos para la categoría <strong>${categoriaTexto}</strong>.
                 </p>
               </div>
             `;
-
-            // Ocultar panel derecho y limpiar contenido anterior
+            // Ocultar panel izquierdo y derecho si no hay proyectos
+            if (panelIzquierdo) panelIzquierdo.classList.add("d-none");
             if (panelDetalle) panelDetalle.classList.add("d-none");
-            if (contenido) contenido.innerHTML = "";
+            if (contenido) contenido.innerHTML = ""; // Limpiar contenido del panel derecho
             return;
           }
 
-          // Mostrar panel derecho si hay proyectos
+          // Si hay proyectos, mostrar ambos paneles
+          if (panelIzquierdo) panelIzquierdo.classList.remove("d-none");
           if (panelDetalle) panelDetalle.classList.remove("d-none");
 
           // Agregar proyectos a la lista
@@ -103,26 +121,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
   });
-
-  //  ocultar el panel si no hay proyectos al cargar
-  const listaInicial = document.getElementById("listaProyectos");
-  const panelDetalleInicial = document.getElementById("panelDetalle");
-  const contenidoInicial = document.getElementById("contenidoProyecto");
-  const proyectosIniciales = document.querySelectorAll(
-    "#listaProyectos .list-group-item"
-  );
-
-  if (!proyectosIniciales.length) {
-    if (listaInicial) {
-      listaInicial.innerHTML = `
-        <div class="d-flex flex-column justify-content-center align-items-center text-muted text-center" style="min-height: 300px;">
-          <p class="mb-0">No hay proyectos disponibles en este momento.</p>
-        </div>
-      `;
-    }
-    if (panelDetalleInicial) panelDetalleInicial.classList.add("d-none");
-    if (contenidoInicial) contenidoInicial.innerHTML = "";
-  }
 });
 
 let proyectoSeleccionadoId = null;
@@ -661,11 +659,10 @@ function asignarEnvioFormulario() {
     });
   }
 }
-  window.addEventListener('DOMContentLoaded', function () {
-    const toastMsg = document.getElementById('toastExito');
-    if (toastMsg && toastMsg.textContent.trim() !== "") {
-      const toast = new bootstrap.Toast(toastMsg);
-      toast.show();
-    }
-  });
-
+window.addEventListener("DOMContentLoaded", function () {
+  const toastMsg = document.getElementById("toastExito");
+  if (toastMsg && toastMsg.textContent.trim() !== "") {
+    const toast = new bootstrap.Toast(toastMsg);
+    toast.show();
+  }
+});

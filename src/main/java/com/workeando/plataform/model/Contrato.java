@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
+@Table(name = "contrato")
 public class Contrato {
 
     @Id
@@ -12,72 +13,43 @@ public class Contrato {
     private Integer idContrato;
 
     @OneToOne
-    @JoinColumn(name = "Postulacion_idPostulacion")
-    private Postulacion postulacion;
+    @JoinColumn(name = "idPostulacion", nullable = false)
+    private Postulacion postulacion; // ⚠️ Asegúrate de que esta clase exista
 
+    @Column(name = "Fecha_Inicio")
     private LocalDate fechaInicio;
+
+    @Column(name = "Fecha_Fin")
     private LocalDate fechaFin;
+
+    @Column(length = 50)
     private String estado;
 
-    @OneToMany(mappedBy = "contrato")
-    private List<Calificacion> calificaciones;
+    @OneToMany(mappedBy = "contrato", cascade = CascadeType.ALL)
+    private List<Calificacion> calificaciones; // ⚠️ Asegúrate de que esta clase exista
 
-    @OneToOne(mappedBy = "contrato")
-    private Pago pago;
+    @OneToOne(mappedBy = "contrato", cascade = CascadeType.ALL)
+    private Pago pago; // ⚠️ Asegúrate de que esta clase exista
 
-    public Integer getIdContrato() {
-        return idContrato;
-    }
+    // Getters y Setters
+    public Integer getIdContrato() { return idContrato; }
+    public void setIdContrato(Integer idContrato) { this.idContrato = idContrato; }
 
-    public void setIdContrato(Integer idContrato) {
-        this.idContrato = idContrato;
-    }
+    public Postulacion getPostulacion() { return postulacion; }
+    public void setPostulacion(Postulacion postulacion) { this.postulacion = postulacion; }
 
-    public Postulacion getPostulacion() {
-        return postulacion;
-    }
+    public LocalDate getFechaInicio() { return fechaInicio; }
+    public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
 
-    public void setPostulacion(Postulacion postulacion) {
-        this.postulacion = postulacion;
-    }
+    public LocalDate getFechaFin() { return fechaFin; }
+    public void setFechaFin(LocalDate fechaFin) { this.fechaFin = fechaFin; }
 
-    public LocalDate getFechaInicio() {
-        return fechaInicio;
-    }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
 
-    public void setFechaInicio(LocalDate fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
+    public List<Calificacion> getCalificaciones() { return calificaciones; }
+    public void setCalificaciones(List<Calificacion> calificaciones) { this.calificaciones = calificaciones; }
 
-    public LocalDate getFechaFin() {
-        return fechaFin;
-    }
-
-    public void setFechaFin(LocalDate fechaFin) {
-        this.fechaFin = fechaFin;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
-
-    public List<Calificacion> getCalificaciones() {
-        return calificaciones;
-    }
-
-    public void setCalificaciones(List<Calificacion> calificaciones) {
-        this.calificaciones = calificaciones;
-    }
-
-    public Pago getPago() {
-        return pago;
-    }
-
-    public void setPago(Pago pago) {
-        this.pago = pago;
-    }
+    public Pago getPago() { return pago; }
+    public void setPago(Pago pago) { this.pago = pago; }
 }

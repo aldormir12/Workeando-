@@ -1,4 +1,4 @@
-package com.workeando.plataform.service.impl;
+package com.workeando.plataform.serviceimpl;
 
 import com.workeando.plataform.model.Usuario;
 import com.workeando.plataform.repository.UsuarioRepository;
@@ -19,8 +19,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String correo) throws UsernameNotFoundException {
-Usuario usuario = usuarioRepository.findByCorreo(correo)
-    .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + correo));
+        Usuario usuario = usuarioRepository.findByCorreo(correo)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + correo));
         if (usuario == null) {
             throw new UsernameNotFoundException("Usuario no encontrado: " + correo);
         }

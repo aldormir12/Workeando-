@@ -1,9 +1,20 @@
 package com.workeando.plataform.model;
 
-import jakarta.persistence.*;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+
 @Entity
+@Table(name = "empleador")
 public class Empleador {
 
     @Id
@@ -11,14 +22,16 @@ public class Empleador {
     private Integer idEmpleador;
 
     @OneToOne
-    @JoinColumn(name = "Usuario_idUsuario")
+    @JoinColumn(name = "idUsuario", nullable = false)
     private Usuario usuario;
 
+    @Column(length = 100)
     private String empresa;
 
-    @OneToMany(mappedBy = "empleador")
+    @OneToMany(mappedBy = "empleador", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Proyecto> proyectos;
 
+    // Getters y Setters
     public Integer getIdEmpleador() {
         return idEmpleador;
     }
@@ -51,3 +64,4 @@ public class Empleador {
         this.proyectos = proyectos;
     }
 }
+

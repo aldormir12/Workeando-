@@ -1,6 +1,10 @@
 package com.workeando.plataform.repository;
 
+//import com.workeando.plataform.model.Freelancer;
 import com.workeando.plataform.model.Postulacion;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +21,11 @@ public interface PostulacionRepository extends JpaRepository<Postulacion, Long> 
 
     // obtener postulaciones por correo
     List<Postulacion> findByCorreoFreelancer(String correoFreelancer);
-    
+
     List<Postulacion> findByProyectoCreadorCorreo(String correo);
 
+    Page<Postulacion> findByProyectoCreadorCorreo(String correo, Pageable pageable);
+
+
+    
 }

@@ -1,14 +1,17 @@
 package com.workeando.plataform.service;
 
+import com.workeando.plataform.model.Proyecto;
+
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.workeando.plataform.model.Proyecto;
+
 
 public interface ProyectoService {
+
     Proyecto guardar(Proyecto proyecto);
 
     List<Proyecto> listarTodos();
@@ -25,9 +28,12 @@ public interface ProyectoService {
 
     List<Proyecto> listarTodosPorCorreo(String correo);
 
-    Page<Proyecto> listarTodosPorCorreoPaginado(String correo, Pageable pageable);
+// Declaración del método para listar proyectos por categoría
+    List<Proyecto> listarPorCategoria(Long categoriaId);
 
-    Page<Proyecto> listarTodosPaginado(Pageable pageable);
 
-    Page<Proyecto> listarPorEstadoPaginado(String estado, Pageable pageable);
+    // paginación
+    Page<Proyecto> listarPorCorreoPaginado(String correo, Pageable pageable);
+    
+
 }
