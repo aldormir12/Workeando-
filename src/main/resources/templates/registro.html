@@ -1,102 +1,236 @@
 <!DOCTYPE html>
-<html
-  lang="es"
-  xmlns:th="http://www.thymeleaf.org"
-  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
-    <title>Registro de Usuario</title>
+    <title>Crear cuenta - Workeando</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
+    <style>
+      /* Fondo sobrio celeste-azulado (igual que login) */
+      body {
+        background: #e8f2f7;
+      }
+
+      /* Columna izquierda: composición y tipografía (match login) */
+      .hero-wrap {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+      }
+      .hero-title {
+        font-weight: 800;
+        line-height: 1.1;
+        color: #343a40;
+        letter-spacing: -0.5px;
+      }
+      .hero-title .accent-blue {
+        color: #0d6efd;
+        display: block;
+      }
+      .hero-subtitle {
+        color: #6c757d;
+        max-width: 48ch;
+      }
+      .hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(2px);
+        font-weight: 600;
+        color: #495057;
+        user-select: none;
+        pointer-events: none;
+      }
+      .hero-pill i {
+        opacity: 0.8;
+      }
+
+      /* Tarjeta de registro sobria (match login) */
+      .register-card {
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 14px;
+      }
+
+      /* Inputs y ayudas */
+      .form-label {
+        color: #495057;
+        font-weight: 600;
+      }
+      .form-text {
+        color: #6c757d;
+      }
+
+      /* Botón principal coherente con login */
+      .btn-primary,
+      .btn-dark {
+        border-radius: 0.5rem;
+      }
+    </style>
   </head>
   <body th:attr="data-registro-exitoso=${registroExitoso ?: false}">
-    <div class="container mt-5" style="max-width: 500px">
-      <h2 class="text-center mb-4">Registrarse en Workeando</h2>
-
-      <form
-        th:action="@{/usuarios/registro}"
-        method="post"
-        th:object="${usuario}"
-        class="mt-4"
-      >
-        <!-- Nombre -->
-        <div class="mb-3">
-          <label for="nombre" class="form-label">Nombre completo</label>
-          <input
-            type="text"
-            class="form-control"
-            th:field="*{nombre}"
-            required
-          />
-          <div
-            class="text-danger"
-            th:if="${#fields.hasErrors('nombre')}"
-            th:errors="*{nombre}"
-          ></div>
-        </div>
-
-        <!-- Correo -->
-        <div class="mb-3">
-          <label for="correo" class="form-label">Correo electrónico</label>
-          <input
-            type="email"
-            class="form-control"
-            th:field="*{correo}"
-            required
-          />
-          <div
-            class="text-danger"
-            th:if="${#fields.hasErrors('correo')}"
-            th:errors="*{correo}"
-          ></div>
-        </div>
-
-        <!-- Contraseña -->
-        <div class="mb-3">
-          <label for="contrasena" class="form-label">Contraseña</label>
-          <input
-            type="password"
-            class="form-control"
-            th:field="*{contrasena}"
-            required
-          />
-          <div
-            class="text-danger"
-            th:if="${#fields.hasErrors('contrasena')}"
-            th:errors="*{contrasena}"
-          >
-            Error en contraseña
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Columna izquierda: mensaje para primeras veces -->
+        <div class="col-lg-7 px-4 px-md-5 hero-wrap">
+          <div class="w-100">
+            <h1 class="hero-title display-4 mb-3">
+              CREA TU CUENTA Y COMIENZA
+              <span class="accent-blue">A POSTULAR O CONTRATAR</span>
+            </h1>
+            <p class="hero-subtitle mb-4">
+              Únete a Workeando para descubrir proyectos a tu medida o encontrar
+              el talento ideal para tu equipo. Rápido, claro y sin
+              complicaciones.
+            </p>
+            <div class="d-flex gap-3 flex-wrap">
+              <span class="hero-pill">
+                <i class="fa-solid fa-user-pen"></i> Perfil en minutos
+              </span>
+              <span class="hero-pill">
+                <i class="fa-solid fa-magnifying-glass"></i> Búsqueda efectiva
+              </span>
+              <span class="hero-pill">
+                <i class="fa-solid fa-shield-halved"></i> Publicaciones seguras
+              </span>
+            </div>
           </div>
         </div>
 
-        <!-- Rol -->
-        <div class="mb-3">
-          <label for="rol" class="form-label">Rol</label>
-          <select class="form-select" th:field="*{rol}" required>
-            <option value="">Seleccione un rol</option>
-            <option
-              th:each="r : ${roles}"
-              th:value="${r}"
-              th:text="${r}"
-            ></option>
-          </select>
+        <!-- Columna derecha: registro -->
+        <div
+          class="col-lg-5 d-flex align-items-center justify-content-center py-5"
+        >
           <div
-            class="text-danger"
-            th:if="${#fields.hasErrors('rol')}"
-            th:errors="*{rol}"
-          ></div>
+            class="card shadow-sm p-4 register-card"
+            style="width: 100%; max-width: 450px"
+          >
+            <h2 class="text-center mb-4" style="color: #343a40">
+              Crear cuenta
+            </h2>
+
+            <form
+              th:action="@{/usuarios/registro}"
+              method="post"
+              th:object="${usuario}"
+            >
+              <!-- Nombre -->
+              <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre completo</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  th:field="*{nombre}"
+                  placeholder="Ej. Ana Torres"
+                  required
+                />
+                <div
+                  class="text-danger small"
+                  th:if="${#fields.hasErrors('nombre')}"
+                  th:errors="*{nombre}"
+                ></div>
+              </div>
+
+              <!-- Correo -->
+              <div class="mb-3">
+                <label for="correo" class="form-label"
+                  >Correo electrónico</label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  th:field="*{correo}"
+                  placeholder="tu@correo.com"
+                  required
+                />
+
+                <div
+                  class="text-danger small"
+                  th:if="${#fields.hasErrors('correo')}"
+                  th:errors="*{correo}"
+                ></div>
+              </div>
+
+              <!-- Contraseña -->
+              <div class="mb-3">
+                <label for="contrasena" class="form-label">Contraseña</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  th:field="*{contrasena}"
+                  placeholder="Mínimo 8 caracteres"
+                  required
+                />
+
+                <div
+                  class="text-danger small"
+                  th:if="${#fields.hasErrors('contrasena')}"
+                  th:errors="*{contrasena}"
+                ></div>
+              </div>
+
+              <!-- ¿Cómo quieres usar Workeando? (rol) -->
+              <div class="mb-3">
+                <label for="rol" class="form-label"
+                  >¿Cómo quieres usar Workeando?</label
+                >
+                <select class="form-select" th:field="*{rol}" required>
+                  <option value="">Selecciona una opción</option>
+                  <!-- Ajusta los values a tus enums/constantes backend -->
+                  <option value="FREELANCER">
+                    Freelancer — Quiero trabajar
+                  </option>
+                  <option value="EMPLEADOR">
+                    Empleador — Quiero contratar talento
+                  </option>
+                  <!-- Si prefieres poblar desde ${roles}, puedes mapear etiquetas con th:switch -->
+                </select>
+                <div class="form-text">
+                  Esto nos ayuda a mostrarte la experiencia adecuada.
+                </div>
+                <div
+                  class="text-danger small"
+                  th:if="${#fields.hasErrors('rol')}"
+                  th:errors="*{rol}"
+                ></div>
+              </div>
+
+              <button type="submit" class="btn btn-dark w-100">
+                Crear cuenta
+              </button>
+
+              <!-- Éxito o errores globales (opcional) -->
+              <div
+                class="alert alert-danger mt-3 mb-0"
+                th:if="${#fields.hasGlobalErrors()}"
+              >
+                <span
+                  th:each="err : ${#fields.globalErrors()}"
+                  th:text="${err}"
+                ></span>
+              </div>
+            </form>
+
+            <div class="text-center mt-4">
+              ¿Ya tienes cuenta?
+              <a th:href="@{/login}">Inicia sesión</a>
+            </div>
+          </div>
         </div>
-
-        <button type="submit" class="btn btn-primary w-100">Registrarse</button>
-      </form>
-
-      <div class="mt-4 text-center">
-        ¿Ya tienes una cuenta? <a th:href="@{/login}">Inicia sesión</a>
       </div>
     </div>
+
+    <!-- Modal de éxito tras registro -->
     <div
       class="modal fade"
       id="registroExitoModal"
@@ -119,26 +253,20 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
       window.addEventListener("DOMContentLoaded", () => {
         const exito = document.body.dataset.registroExitoso;
-
-        
         if (exito === "true") {
           const modal = new bootstrap.Modal(
             document.getElementById("registroExitoModal")
           );
           modal.show();
         }
-
-        // Botón para ir a login
         const btnIrALogin = document.getElementById("btnIrALogin");
-        if (btnIrALogin) {
+        if (btnIrALogin)
           btnIrALogin.addEventListener("click", () => {
             window.location.href = "/login";
           });
-        }
       });
     </script>
   </body>

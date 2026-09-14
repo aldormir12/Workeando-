@@ -1,3 +1,4 @@
+
 function interpretarModalidadPago(valor) {
   switch (valor) {
     case "POR_PROYECTO":
@@ -154,77 +155,89 @@ function seleccionarProyecto(item, id) {
         contenedor.replaceChildren(nuevoContenido);
         return;
       }
+fetch(`/api/proyectos/${id}`)
+  .then((response) => response.json())
+  .then((data) => {
+    contenedor.innerHTML = `
+  <div id="detalleProyecto" class="bg-white rounded-3 p-4" style="max-height: 80vh; overflow-y: auto">
+    <div class="d-flex align-items-start justify-content-between mb-3">
+      <h4 id="tituloProyecto" class="section-title mb-0 text-body">
+        <i class="fas fa-clipboard-list me-2" style="color: #0d6efd"></i>
+        <span id="tituloTexto">${data.titulo}</span>
+      </h4>
+    </div>
 
-      // Si no está postulado, obtener los detalles
-      fetch(`/api/proyectos/${id}`)
-        .then((response) => response.json())
-        .then((data) => {
-          contenedor.innerHTML = `
-            <div id="detalleProyecto" class="shadow-sm bg-white rounded p-4" style="max-height: 80vh; overflow-y: auto">
-              <h4 id="tituloProyecto" class="fw-bold mb-3 text-dark">
-                <i class="fas fa-clipboard me-2 text-primary"></i>
-                <span id="tituloTexto">${data.titulo}</span>
-              </h4>
+    <ul class="list-unstyled small mb-0 text-secondary meta-list">
+      <li class="mb-2">
+        <span class="text-body fw-semibold">
+          <i class="fas fa-align-left me-2" style="color: #198754"></i>Descripción:
+        </span>
+        <span id="descProyecto" class="multiline"></span>
+      </li>
 
-              <ul class="list-unstyled text-muted small mb-4">
-                <li class="mb-2">
-                  <i class="fas fa-align-left me-2 text-primary"></i>
-                  <strong>Descripción:</strong> <span id="descProyecto">${
-                    data.descripcion
-                  }</span>
-                </li>
-             <li class="mb-2">
-  <i class="fas fa-tags me-2 text-success"></i>
-  <strong>Categoría:</strong> <span id="catProyecto">${
-    data.categoria?.nombre ?? "Sin categoría"
-  }</span>
-</li>
+      <li class="mb-2">
+        <span class="text-body fw-semibold">
+          <i class="fas fa-tag me-2" style="color: #6f42c1"></i>Categoría:
+        </span>
+        <span id="catProyecto">${data.categoria?.nombre ?? "Sin categoría"}</span>
+      </li>
 
-                <li class="mb-2">
-                  <i class="fas fa-map-marker-alt me-2 text-danger"></i>
-                  <strong>Ubicación:</strong> <span id="ubiProyecto">${
-                    data.ubicacion
-                  }</span>
-                </li>
-                <li class="mb-2">
-                  <i class="fas fa-money-bill me-2 text-warning"></i>
-                  <strong>Pago:</strong> <span id="pagoProyecto">S/ ${
-                    data.presupuesto
-                  } ${interpretarModalidadPago(data.modalidadPago)}</span>
-                </li>
-                <li class="mb-2">
-                  <i class="fas fa-calendar-plus me-2 text-info"></i>
-                  <strong>Inicio:</strong> <span id="inicioProyecto">${
-                    data.fechaInicio
-                  }</span>
-                </li>
-                <li class="mb-2">
-                  <i class="fas fa-calendar-check me-2 text-info"></i>
-                  <strong>Final:</strong> <span id="finProyecto">${
-                    data.fechaFinal
-                  }</span>
-                </li>
-                <li>
-                  <i class="fas fa-laptop-house me-2 text-secondary"></i>
-                  <strong>Modalidad:</strong> <span id="modProyecto">${
-                    data.modalidad
-                  }</span>
-                </li>
-              </ul>
+      <li class="mb-2">
+        <span class="text-body fw-semibold">
+          <i class="fas fa-map-marker-alt me-2" style="color: #dc3545"></i>Ubicación:
+        </span>
+        <span id="ubiProyecto">${data.ubicacion}</span>
+      </li>
 
-              <form id="formPostulacion" method="post">
-                <input type="hidden" id="montoContraofertaInput" name="montoContraoferta" />
-                <button type="submit" class="btn btn-primary me-2">
-                  <i class="fas fa-paper-plane me-1"></i> Postular
-                </button>
-                <button type="button" class="btn btn-outline-dark" id="btnContraoferta">
-                  <i class="fas fa-hand-holding-usd me-1"></i> Enviar contraoferta
-                </button>
-              </form>
+      <li class="mb-2">
+        <span class="text-body fw-semibold">
+          <i class="fas fa-coins me-2" style="color: #ffc107"></i>Pago:
+        </span>
+        <span id="pagoProyecto">S/ ${data.presupuesto} ${interpretarModalidadPago(data.modalidadPago)}</span>
+      </li>
 
-              <div id="contenedorInfoContraoferta" class="mt-3"></div>
-            </div>
-          `;
+      <li class="mb-2">
+        <span class="text-body fw-semibold">
+          <i class="fas fa-calendar-plus me-2" style="color: #20c997"></i>Inicio:
+        </span>
+        <span id="inicioProyecto">${data.fechaInicio}</span>
+      </li>
+
+      <li class="mb-2">
+        <span class="text-body fw-semibold">
+          <i class="fas fa-calendar-check me-2" style="color: #0dcaf0"></i>Final:
+        </span>
+        <span id="finProyecto">${data.fechaFinal}</span>
+      </li>
+
+      <li>
+        <span class="text-body fw-semibold">
+          <i class="fas fa-laptop me-2" style="color: #6c757d"></i>Modalidad:
+        </span>
+        <span id="modProyecto">${data.modalidad}</span>
+      </li>
+    </ul>
+
+    <form id="formPostulacion" method="post" class="d-flex gap-2 flex-wrap mt-3">
+      <input type="hidden" id="montoContraofertaInput" name="montoContraoferta" />
+      <button type="submit" class="btn btn-dark btn-sm">
+        <i class="fas fa-paper-plane me-1"></i>Postular
+      </button>
+      <button type="button" class="btn btn-outline-secondary btn-sm" id="btnContraoferta">
+        <i class="fas fa-hand-holding-usd me-1"></i>Enviar contraoferta
+      </button>
+    </form>
+
+    <div id="contenedorInfoContraoferta" class="mt-3"></div>
+  </div>
+`;
+
+
+
+    const descEl = document.getElementById("descProyecto");
+    if (descEl) {
+      descEl.textContent = data.descripcion ?? "";
+    }
 
           // Reasignar evento para botón de contraoferta
           const btnLanzador = document.getElementById("btnContraoferta");
@@ -666,3 +679,5 @@ window.addEventListener("DOMContentLoaded", function () {
     toast.show();
   }
 });
+
+

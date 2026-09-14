@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -75,6 +77,32 @@ public class ProyectoController {
         proyectoService.guardar(proyecto);
         model.addAttribute("registroExitoso", true);
         return "redirect:/emple";
+    }
+
+    @PostMapping("/{id}/cancelar")
+    @ResponseBody
+    public ResponseEntity<String> cancelar(@PathVariable Long id) {
+        try {
+            proyectoService.cancelarProyecto(id);
+            return ResponseEntity.ok("{\"ok\":true}");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(404).body("{\"error\":\"proyecto_no_encontrado\"}");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body("{\"error\":\"transicion_invalida\"}");
+        }
+    }
+
+    @PostMapping("/{id}/finalizar")
+    @ResponseBody
+    public ResponseEntity<String> finalizar(@PathVariable Long id) {
+        try {
+            proyectoService.finalizarProyecto(id);
+            return ResponseEntity.ok("{\"ok\":true}");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(404).body("{\"error\":\"proyecto_no_encontrado\"}");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body("{\"error\":\"transicion_invalida\"}");
+        }
     }
 
     // se muestran los proyectos en formato json

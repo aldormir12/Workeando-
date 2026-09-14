@@ -9,6 +9,8 @@ import com.workeando.plataform.service.FreelancerService;
 import com.workeando.plataform.service.PostulacionService;
 import com.workeando.plataform.service.ProyectoService;
 import com.workeando.plataform.service.UsuarioService;
+import com.workeando.plataform.service.FypService;
+
 //import com.workeando.plataform.service.PostulacionService;
 
 import jakarta.validation.Valid;
@@ -38,6 +40,7 @@ public class FreelancerController {
     private final ProyectoService proyectoService;
     private final FreelancerService freelancerService;
     private final UsuarioService usuarioService;
+    private final FypService fypService;
     private final CategoriaService categoriaService;
     private final PostulacionService postulacionService;
 
@@ -45,69 +48,91 @@ public class FreelancerController {
             FreelancerService freelancerService,
             UsuarioService usuarioService,
             CategoriaService categoriaService,
-            PostulacionService postulacionService) {
+            PostulacionService postulacionService,
+            FypService fypService) {
         this.proyectoService = proyectoService;
         this.freelancerService = freelancerService;
         this.usuarioService = usuarioService;
         this.categoriaService = categoriaService;
         this.postulacionService = postulacionService;
+        this.fypService = fypService;
     }
 
-@GetMapping("/free")
-public String freelancerPage(@RequestParam(required = false) String categoria,
-        Model model,
-        Authentication authentication) {
-    // Obtiene el correo del usuario autenticado
-    String email = authentication.getName();
-    
-    // Busca al usuario con el correo
-    Usuario usuario = usuarioService.buscarPorCorreo(email);
-    model.addAttribute("nombre", usuario.getNombre());
+    @GetMapping("/free")
+    public String freelancerPage(@RequestParam(required = false) String categoria,
+            Model model,
+            Authentication authentication) {
+        // Obtiene el correo del usuario autenticado
+        String email = authentication.getName();
 
-    // Verifica si el freelancer ya tiene perfil
-    boolean tienePerfil = freelancerService.perfilExiste(usuario);
-    model.addAttribute("tienePerfil", tienePerfil);
+        // Busca al usuario con el correo
+        Usuario usuario = usuarioService.buscarPorCorreo(email);
+        model.addAttribute("nombre", usuario.getNombre());
 
-    // Si no tiene perfil, asignamos uno por defecto
-    if (!tienePerfil) {
-        Freelancer perfilPorDefecto = new Freelancer();
-        perfilPorDefecto.setUsuario(usuario);  
-        perfilPorDefecto.setTelefono("");  
-        perfilPorDefecto.setNivelEstudios("No especificado");  
-        perfilPorDefecto.setLinkedin("");  
-        perfilPorDefecto.setPortafolio("");  
-        perfilPorDefecto.setEsPerfilPorDefecto(true);  
+        // Verifica si el freelancer ya tiene perfil
+        boolean tienePerfil = freelancerService.perfilExiste(usuario);
+        model.addAttribute("tienePerfil", tienePerfil);
 
-        // Guardamos el perfil por defecto
-        freelancerService.guardarFreelancer(perfilPorDefecto);
+        if (!tienePerfil) {
+            // Crear perfil por defecto
+            Freelancer perfilPorDefecto = new Freelancer();
+            perfilPorDefecto.setUsuario(usuario);
+            perfilPorDefecto.setTelefono("");
+            perfilPorDefecto.setNivelEstudios("No especificado");
+            perfilPorDefecto.setLinkedin("");
+            perfilPorDefecto.setPortafolio("");
+            perfilPorDefecto.setEsPerfilPorDefecto(true);
 
-        model.addAttribute("alertaPerfil", "Tu perfil ha sido creado automáticamente con información básica. ¡Completa tu perfil para mejorar tus posibilidades de ser elegido!");
-        model.addAttribute("esPerfilPorDefecto", true);  // Perfil por defecto
-    } else {
-        Freelancer freelancer = freelancerService.buscarPorUsuario(usuario).get();
-        if (freelancer.getEsPerfilPorDefecto()) {
-            model.addAttribute("alertaPerfil", "Tu perfil ha sido creado automáticamente con información básica. ¡Completa tu perfil para mejorar tus posibilidades de ser elegido!");
-            model.addAttribute("esPerfilPorDefecto", true);  // Perfil por defecto
+            // Guardar perfil por defecto
+            freelancerService.guardarFreelancer(perfilPorDefecto);
+
+            // Enviar al modelo
+            model.addAttribute("freelancer", perfilPorDefecto);
+            model.addAttribute("alertaPerfil",
+                    "Tu perfil ha sido creado automáticamente con información básica. ¡Completa tu perfil para mejorar tus posibilidades de ser elegido!");
+            model.addAttribute("esPerfilPorDefecto", true);
+
         } else {
-            model.addAttribute("esPerfilPorDefecto", false);  // Ya está completado
+            // Perfil ya existe, cargarlo
+            Freelancer freelancer = freelancerService.buscarPorUsuario(usuario).get();
+
+            model.addAttribute("freelancer", freelancer);
+
+            if (freelancer.getEsPerfilPorDefecto()) {
+                model.addAttribute("alertaPerfil",
+                        "Tu perfil ha sido creado automáticamente con información básica. ¡Completa tu perfil para mejorar tus posibilidades de ser elegido!");
+                model.addAttribute("esPerfilPorDefecto", true);
+            } else {
+                model.addAttribute("esPerfilPorDefecto", false);
+            }
         }
+
+        // Decidir si usar FYP (perfil existente y no por defecto)
+        boolean usarFyp = false;
+        if (tienePerfil) {
+            Optional<Freelancer> fOpt = freelancerService.buscarPorUsuario(usuario);
+            if (fOpt.isPresent() && !fOpt.get().getEsPerfilPorDefecto()) {
+                usarFyp = true;
+            }
+        }
+
+        List<Proyecto> proyectos;
+        if (usarFyp) {
+            proyectos = fypService.feedParaUsuario(email, 50);
+            model.addAttribute("fyp", true);
+        } else {
+            if (categoria != null && !categoria.isBlank()) {
+                proyectos = proyectoService.listarPorCategoriaYEstado(categoria, "Abierto");
+            } else {
+                proyectos = proyectoService.listarPorEstado("Abierto");
+            }
+        }
+
+        model.addAttribute("proyectos", proyectos);
+        model.addAttribute("categoriaSeleccionada", categoria);
+
+        return "free";
     }
-
-    // Obtener proyectos por categoría y estado "Abierto"
-    List<Proyecto> proyectos;
-    if (categoria != null && !categoria.isBlank()) {
-        proyectos = proyectoService.listarPorCategoriaYEstado(categoria, "Abierto");
-    } else {
-        proyectos = proyectoService.listarPorEstado("Abierto");
-    }
-
-    model.addAttribute("proyectos", proyectos);
-    model.addAttribute("categoriaSeleccionada", categoria);
-
-    return "free";  
-}
-
-
 
     @GetMapping("/free/perfil")
     public String mostrarFormularioPerfil(
@@ -136,136 +161,135 @@ public String freelancerPage(@RequestParam(required = false) String categoria,
             freelancer.getExperienciaLaboral().add(new com.workeando.plataform.model.ExperienciaLaboral());
         }
 
-    model.addAttribute("soloLectura", false); // Freelancer puede editar
+        model.addAttribute("soloLectura", false); // Freelancer puede editar
 
-    model.addAttribute("freelancer", freelancer);
-    model.addAttribute("categorias", categoriaService.listarTodas());
-    model.addAttribute("habilidadesDisponibles", obtenerHabilidadesDisponibles());
-    model.addAttribute("cvProcesado", false);
-    model.addAttribute("modoEdicion", modoEdicion); 
-        return "crearPerfil";
-    }
-
-  @PostMapping("/free/perfil")
-public String guardarPerfil(
-        @ModelAttribute("freelancer") @Valid Freelancer freelancer,
-        BindingResult result,
-        Authentication authentication,
-        Model model,
-        RedirectAttributes redirectAttributes) {
-
-    System.out.println(" MÉTODO guardarPerfil INVOCADO");
-
-    // Validación: mínimo una categoría
-    if (freelancer.getCategorias() == null || freelancer.getCategorias().isEmpty()) {
-        result.rejectValue("categorias", "error.categorias", "Debes seleccionar al menos una categoría");
+        model.addAttribute("freelancer", freelancer);
         model.addAttribute("categorias", categoriaService.listarTodas());
-        model.addAttribute("cvProcesado", true);
+        model.addAttribute("habilidadesDisponibles", obtenerHabilidadesDisponibles());
+        model.addAttribute("cvProcesado", false);
+        model.addAttribute("modoEdicion", modoEdicion);
         return "crearPerfil";
     }
 
-    // Validación: URL del portafolio (si existe)
-    if (freelancer.getPortafolio() != null && !freelancer.getPortafolio().isBlank()) {
-        String urlRegex = "^(https?://)?[\\w.-]+(?:\\.[\\w\\.-]+)+[/#?]?.*$";
-        if (!freelancer.getPortafolio().matches(urlRegex)) {
-            result.rejectValue("portafolio", "urlInvalida", "El portafolio debe ser una URL válida");
+    @PostMapping("/free/perfil")
+    public String guardarPerfil(
+            @ModelAttribute("freelancer") @Valid Freelancer freelancer,
+            BindingResult result,
+            Authentication authentication,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        System.out.println(" MÉTODO guardarPerfil INVOCADO");
+
+        // Validación: mínimo una categoría
+        if (freelancer.getCategorias() == null || freelancer.getCategorias().isEmpty()) {
+            result.rejectValue("categorias", "error.categorias", "Debes seleccionar al menos una categoría");
             model.addAttribute("categorias", categoriaService.listarTodas());
-            return "crearPerfil";
-        }
-    }
-
-    // Validación: fechas de experiencia laboral
-    SimpleDateFormat sdf = new SimpleDateFormat("MM/yyyy");
-    Date fechaActual = new Date();
-    String fechaRegex = "^\\d{2}/\\d{4}$";
-
-    for (int i = 0; i < freelancer.getExperienciaLaboral().size(); i++) {
-        ExperienciaLaboral exp = freelancer.getExperienciaLaboral().get(i);
-
-        if (exp.getFechaDesde() != null && !exp.getFechaDesde().matches(fechaRegex)) {
-            result.rejectValue("experienciaLaboral[" + i + "].fechaDesde", "fechaInvalida",
-                    "La fecha de inicio debe tener el formato MM/YYYY");
-            model.addAttribute("categorias", categoriaService.listarTodas());
+            model.addAttribute("cvProcesado", true);
             return "crearPerfil";
         }
 
-        if (exp.getFechaHasta() != null && !exp.getFechaHasta().equalsIgnoreCase("Actualidad")) {
-            if (!exp.getFechaHasta().matches(fechaRegex)) {
-                result.rejectValue("experienciaLaboral[" + i + "].fechaHasta", "fechaInvalida",
-                        "La fecha de fin debe tener el formato MM/YYYY o ser 'Actualidad'");
-                model.addAttribute("categorias", categoriaService.listarTodas());
-                return "crearPerfil";
-            }
-
-            try {
-                Date fechaDesde = sdf.parse(exp.getFechaDesde());
-                Date fechaHasta = sdf.parse(exp.getFechaHasta());
-
-                if (fechaHasta.before(fechaDesde)) {
-                    result.rejectValue("experienciaLaboral[" + i + "].fechaHasta", "fechaInvalida",
-                            "La fecha de fin no puede ser anterior a la fecha de inicio");
-                    model.addAttribute("categorias", categoriaService.listarTodas());
-                    return "crearPerfil";
-                }
-
-                if (fechaHasta.after(fechaActual)) {
-                    result.rejectValue("experienciaLaboral[" + i + "].fechaHasta", "fechaInvalida",
-                            "La fecha de fin no puede ser posterior a la fecha actual");
-                    model.addAttribute("categorias", categoriaService.listarTodas());
-                    return "crearPerfil";
-                }
-
-            } catch (ParseException e) {
-                result.rejectValue("experienciaLaboral[" + i + "].fechaHasta", "fechaInvalida",
-                        "Error al procesar las fechas");
+        // Validación: URL del portafolio (si existe)
+        if (freelancer.getPortafolio() != null && !freelancer.getPortafolio().isBlank()) {
+            String urlRegex = "^(https?://)?[\\w.-]+(?:\\.[\\w\\.-]+)+[/#?]?.*$";
+            if (!freelancer.getPortafolio().matches(urlRegex)) {
+                result.rejectValue("portafolio", "urlInvalida", "El portafolio debe ser una URL válida");
                 model.addAttribute("categorias", categoriaService.listarTodas());
                 return "crearPerfil";
             }
         }
+
+        // Validación: fechas de experiencia laboral
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/yyyy");
+        Date fechaActual = new Date();
+        String fechaRegex = "^\\d{2}/\\d{4}$";
+
+        for (int i = 0; i < freelancer.getExperienciaLaboral().size(); i++) {
+            ExperienciaLaboral exp = freelancer.getExperienciaLaboral().get(i);
+
+            if (exp.getFechaDesde() != null && !exp.getFechaDesde().matches(fechaRegex)) {
+                result.rejectValue("experienciaLaboral[" + i + "].fechaDesde", "fechaInvalida",
+                        "La fecha de inicio debe tener el formato MM/YYYY");
+                model.addAttribute("categorias", categoriaService.listarTodas());
+                return "crearPerfil";
+            }
+
+            if (exp.getFechaHasta() != null && !exp.getFechaHasta().equalsIgnoreCase("Actualidad")) {
+                if (!exp.getFechaHasta().matches(fechaRegex)) {
+                    result.rejectValue("experienciaLaboral[" + i + "].fechaHasta", "fechaInvalida",
+                            "La fecha de fin debe tener el formato MM/YYYY o ser 'Actualidad'");
+                    model.addAttribute("categorias", categoriaService.listarTodas());
+                    return "crearPerfil";
+                }
+
+                try {
+                    Date fechaDesde = sdf.parse(exp.getFechaDesde());
+                    Date fechaHasta = sdf.parse(exp.getFechaHasta());
+
+                    if (fechaHasta.before(fechaDesde)) {
+                        result.rejectValue("experienciaLaboral[" + i + "].fechaHasta", "fechaInvalida",
+                                "La fecha de fin no puede ser anterior a la fecha de inicio");
+                        model.addAttribute("categorias", categoriaService.listarTodas());
+                        return "crearPerfil";
+                    }
+
+                    if (fechaHasta.after(fechaActual)) {
+                        result.rejectValue("experienciaLaboral[" + i + "].fechaHasta", "fechaInvalida",
+                                "La fecha de fin no puede ser posterior a la fecha actual");
+                        model.addAttribute("categorias", categoriaService.listarTodas());
+                        return "crearPerfil";
+                    }
+
+                } catch (ParseException e) {
+                    result.rejectValue("experienciaLaboral[" + i + "].fechaHasta", "fechaInvalida",
+                            "Error al procesar las fechas");
+                    model.addAttribute("categorias", categoriaService.listarTodas());
+                    return "crearPerfil";
+                }
+            }
+        }
+
+        // Obtener usuario autenticado
+        String email = authentication.getName();
+        Usuario usuario = usuarioService.buscarPorCorreo(email);
+
+        // Buscar si ya existe perfil
+        Optional<Freelancer> existenteOpt = freelancerService.buscarPorUsuario(usuario);
+        Freelancer freelancerPersistente;
+
+        if (existenteOpt.isPresent()) {
+            // Modo edición
+            freelancerPersistente = existenteOpt.get();
+
+            freelancerPersistente.setTelefono(freelancer.getTelefono());
+            freelancerPersistente.setNivelEstudios(freelancer.getNivelEstudios());
+            freelancerPersistente.setLinkedin(freelancer.getLinkedin());
+            freelancerPersistente.setPortafolio(freelancer.getPortafolio());
+            freelancerPersistente.setCategorias(freelancer.getCategorias());
+            freelancerPersistente.setIdiomas(freelancer.getIdiomas());
+            freelancerPersistente.getHabilidadesTecnicas().clear();
+            freelancerPersistente.getHabilidadesTecnicas().addAll(freelancer.getHabilidadesTecnicas());
+            freelancerPersistente.setExperienciaLaboral(freelancer.getExperienciaLaboral());
+
+            // Actualiza el estado de perfil por defecto a falso si ya está completo
+            freelancerPersistente.setEsPerfilPorDefecto(false);
+
+        } else {
+            // Modo creación
+            freelancerPersistente = freelancer;
+            freelancerPersistente.setUsuario(usuario);
+
+            // Asignar el perfil por defecto si es el primer perfil
+            freelancerPersistente.setEsPerfilPorDefecto(false); // Cambiar a false al completar el perfil
+        }
+
+        // Guardar perfil
+        freelancerService.guardarFreelancer(freelancerPersistente);
+
+        // Mensaje de éxito
+        redirectAttributes.addFlashAttribute("toastExito", "Tu perfil ha sido guardado con éxito.");
+        return "redirect:/free"; // Redirige a la página de inicio
     }
-
-    // Obtener usuario autenticado
-    String email = authentication.getName();
-    Usuario usuario = usuarioService.buscarPorCorreo(email);
-
-    // Buscar si ya existe perfil
-    Optional<Freelancer> existenteOpt = freelancerService.buscarPorUsuario(usuario);
-    Freelancer freelancerPersistente;
-
-    if (existenteOpt.isPresent()) {
-        // Modo edición
-        freelancerPersistente = existenteOpt.get();
-
-        freelancerPersistente.setTelefono(freelancer.getTelefono());
-        freelancerPersistente.setNivelEstudios(freelancer.getNivelEstudios());
-        freelancerPersistente.setLinkedin(freelancer.getLinkedin());
-        freelancerPersistente.setPortafolio(freelancer.getPortafolio());
-        freelancerPersistente.setCategorias(freelancer.getCategorias());
-        freelancerPersistente.setIdiomas(freelancer.getIdiomas());
-        freelancerPersistente.getHabilidadesTecnicas().clear();
-        freelancerPersistente.getHabilidadesTecnicas().addAll(freelancer.getHabilidadesTecnicas());
-        freelancerPersistente.setExperienciaLaboral(freelancer.getExperienciaLaboral());
-
-        // Actualiza el estado de perfil por defecto a falso si ya está completo
-        freelancerPersistente.setEsPerfilPorDefecto(false);
-
-    } else {
-        // Modo creación
-        freelancerPersistente = freelancer;
-        freelancerPersistente.setUsuario(usuario);
-
-        // Asignar el perfil por defecto si es el primer perfil
-        freelancerPersistente.setEsPerfilPorDefecto(false); // Cambiar a false al completar el perfil
-    }
-
-    // Guardar perfil
-    freelancerService.guardarFreelancer(freelancerPersistente);
-
-    // Mensaje de éxito
-    redirectAttributes.addFlashAttribute("toastExito", "Tu perfil ha sido guardado con éxito.");
-    return "redirect:/free";  // Redirige a la página de inicio
-}
-
 
     @PostMapping("/free/subirCv")
     public String procesarCv(@RequestParam("cvFile") MultipartFile archivo,
@@ -278,14 +302,11 @@ public String guardarPerfil(
         }
 
         try {
-            // 1. Extraer texto del CV usando Apache POI para mantener saltos de línea
             String textoExtraido = freelancerService.extraerTextoDesdeDocx(archivo.getInputStream());
 
-            // 2. Obtener usuario autenticado
             String email = authentication.getName();
             Usuario usuario = usuarioService.buscarPorCorreo(email);
 
-            // 3. Crear nuevo freelancer y asignar datos extraídos
             Freelancer freelancer = new Freelancer();
             freelancer.setUsuario(usuario);
             freelancer.setTelefono(freelancerService.extraerTelefono(textoExtraido));
@@ -300,7 +321,6 @@ public String guardarPerfil(
 
             freelancer.setNivelEstudios("No especificado");
 
-            // 4. Preparar modelo para la vista del formulario
             model.addAttribute("freelancer", freelancer);
             model.addAttribute("categorias", categoriaService.listarTodas());
             model.addAttribute("habilidadesDisponibles", obtenerHabilidadesDisponibles());
@@ -323,14 +343,14 @@ public String guardarPerfil(
 
         Optional<Freelancer> optFreelancer = freelancerService.buscarPorUsuario(usuario);
         if (optFreelancer.isEmpty()) {
-            return "redirect:/free"; // O una vista de error si prefieres
+            return "redirect:/free";
         }
 
         Freelancer freelancer = optFreelancer.get();
         List<Postulacion> postulaciones = postulacionService.buscarPorFreelancer(freelancer);
 
         model.addAttribute("postulaciones", postulaciones);
-        return "misPostulaciones"; // sin extensión .html
+        return "misPostulaciones";
     }
 
     @GetMapping("/freelancer/perfil/{id}")

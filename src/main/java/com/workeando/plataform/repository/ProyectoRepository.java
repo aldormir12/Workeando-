@@ -20,11 +20,10 @@ public interface ProyectoRepository extends JpaRepository<Proyecto, Long> {
     List<Proyecto> findByCreadorCorreo(String correo);
 
     // Verificar si un proyecto existe por ID
-    boolean existsById(@NonNull Long id); // Añadir la anotación @NonNull
+    boolean existsById(@NonNull Long id);
 
     // Buscar proyectos que contengan el título
     List<Proyecto> findByTituloContaining(String titulo);
-
 
     // Método para encontrar proyectos por el nombre de la categoría y el estado
     List<Proyecto> findByCategoriaNombreIgnoreCaseAndEstadoIgnoreCase(String nombreCategoria, String estado);
@@ -32,9 +31,7 @@ public interface ProyectoRepository extends JpaRepository<Proyecto, Long> {
     // Buscar proyectos por el ID de la categoría (agregado)
     List<Proyecto> findByCategoriaIdCategoria(Long categoriaId); // Este método buscará los proyectos por categoría ID
 
-
-
-    //paginación
+    // paginación
     Page<Proyecto> findByCreadorCorreo(String correo, Pageable pageable);
-    
+
 }

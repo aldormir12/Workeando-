@@ -14,7 +14,7 @@ public class Contrato {
 
     @OneToOne
     @JoinColumn(name = "idPostulacion", nullable = false)
-    private Postulacion postulacion; // ⚠️ Asegúrate de que esta clase exista
+    private Postulacion postulacion;
 
     @Column(name = "Fecha_Inicio")
     private LocalDate fechaInicio;
@@ -26,30 +26,64 @@ public class Contrato {
     private String estado;
 
     @OneToMany(mappedBy = "contrato", cascade = CascadeType.ALL)
-    private List<Calificacion> calificaciones; // ⚠️ Asegúrate de que esta clase exista
+    private List<Calificacion> calificaciones;
 
     @OneToOne(mappedBy = "contrato", cascade = CascadeType.ALL)
-    private Pago pago; // ⚠️ Asegúrate de que esta clase exista
+    private Pago pago;
 
-    // Getters y Setters
-    public Integer getIdContrato() { return idContrato; }
-    public void setIdContrato(Integer idContrato) { this.idContrato = idContrato; }
+    public Integer getIdContrato() {
+        return idContrato;
+    }
 
-    public Postulacion getPostulacion() { return postulacion; }
-    public void setPostulacion(Postulacion postulacion) { this.postulacion = postulacion; }
+    public void setIdContrato(Integer idContrato) {
+        this.idContrato = idContrato;
+    }
 
-    public LocalDate getFechaInicio() { return fechaInicio; }
-    public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
+    public Postulacion getPostulacion() {
+        return postulacion;
+    }
 
-    public LocalDate getFechaFin() { return fechaFin; }
-    public void setFechaFin(LocalDate fechaFin) { this.fechaFin = fechaFin; }
+    public void setPostulacion(Postulacion postulacion) {
+        this.postulacion = postulacion;
+    }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public LocalDate getFechaInicio() {
+        return fechaInicio;
+    }
 
-    public List<Calificacion> getCalificaciones() { return calificaciones; }
-    public void setCalificaciones(List<Calificacion> calificaciones) { this.calificaciones = calificaciones; }
+    public void setFechaInicio(LocalDate fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
 
-    public Pago getPago() { return pago; }
-    public void setPago(Pago pago) { this.pago = pago; }
+    public LocalDate getFechaFin() {
+        return fechaFin;
+    }
+
+    public void setFechaFin(LocalDate fechaFin) {
+        this.fechaFin = fechaFin;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public List<Calificacion> getCalificaciones() {
+        return calificaciones;
+    }
+
+    public void setCalificaciones(List<Calificacion> calificaciones) {
+        this.calificaciones = calificaciones;
+    }
+
+    public Pago getPago() {
+        return pago;
+    }
+
+    public void setPago(Pago pago) {
+        this.pago = pago;
+    }
 }

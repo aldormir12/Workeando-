@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "postulaciones")
@@ -35,6 +36,14 @@ public class Postulacion {
 
     @Column(nullable = false)
     private String estado = "Pendiente";
+
+    @Column(nullable = false)
+    private Boolean cvVisto = false;
+
+    @Column(nullable = false)
+    private Boolean finalista = false;
+
+    private LocalDateTime cvVistoAt;
 
     // constructor
     public Postulacion() {
@@ -108,5 +117,29 @@ public class Postulacion {
 
     public void setProyecto(Proyecto proyecto) {
         this.proyecto = proyecto;
+    }
+
+    public Boolean getCvVisto() {
+        return cvVisto;
+    }
+
+    public void setCvVisto(Boolean cvVisto) {
+        this.cvVisto = cvVisto;
+    }
+
+    public Boolean getFinalista() {
+        return finalista;
+    }
+
+    public void setFinalista(Boolean finalista) {
+        this.finalista = finalista;
+    }
+
+    public LocalDateTime getCvVistoAt() {
+        return cvVistoAt;
+    }
+
+    public void setCvVistoAt(LocalDateTime cvVistoAt) {
+        this.cvVistoAt = cvVistoAt;
     }
 }

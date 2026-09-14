@@ -27,6 +27,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 
 @Entity
 @Table(name = "proyectos")
@@ -40,7 +42,7 @@ public class Proyecto {
     @Size(max = 100, message = "El título no debe superar 100 caracteres")
     private String titulo;
 
-    @Column(length = 2000)
+    @Column(length = 3000)
     private String descripcion;
 
     @ManyToOne
@@ -88,6 +90,19 @@ public class Proyecto {
     @ManyToOne
     @JoinColumn(name = "idEmpleador")
     private Empleador empleador;
+
+    @PrePersist
+    @PreUpdate
+    private void syncEstados() {
+        if (estadoProyecto == null) {
+            estadoProyecto = EstadoProyecto.PUBLICADO;
+        }
+        if (estadoProyecto == EstadoProyecto.PUBLICADO) {
+            estado = "Abierto";
+        } else {
+            estado = "Cerrado";
+        }
+    }
 
     public Proyecto() {
     }
@@ -235,6 +250,13 @@ public class Proyecto {
 
     public void setEstado(String estado) {
         this.estado = estado;
+        if ("Abierto".equalsIgnoreCase(estado)) {
+            this.estadoProyecto = EstadoProyecto.PUBLICADO;
+        } else {
+            if (this.estadoProyecto == null || this.estadoProyecto == EstadoProyecto.PUBLICADO) {
+                this.estadoProyecto = EstadoProyecto.EN_PROGRESO;
+            }
+        }
     }
 
     public String getCreadorCorreo() {
@@ -245,13 +267,18 @@ public class Proyecto {
         this.creadorCorreo = creadorCorreo;
     }
 
-    // ESTADO DEL ENUM, ESTADO OFICIAL DE UN PROYECTO
+    // ESTADO OFICIAL DE UN PROYECTO
     public EstadoProyecto getEstadoProyecto() {
         return estadoProyecto;
     }
 
     public void setEstadoProyecto(EstadoProyecto estadoProyecto) {
         this.estadoProyecto = estadoProyecto;
+        if (estadoProyecto == EstadoProyecto.PUBLICADO) {
+            this.estado = "Abierto";
+        } else {
+            this.estado = "Cerrado";
+        }
     }
 
     @AssertTrue(message = "Las fechas deben estar entre hoy y un año a partir de hoy, y la final debe ser posterior a la inicio")

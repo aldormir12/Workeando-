@@ -13,11 +13,16 @@
       rel="stylesheet"
     />
     <link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-/>
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
 
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
+
+    <th:block th:if="${_csrf != null}">
+      <meta name="_csrf" th:content="${_csrf.token}" />
+      <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    </th:block>
   </head>
 
   <body>
@@ -33,19 +38,36 @@
             Bienvenido al portal del empleador
           </h4>
         </div>
+
         <div class="d-flex align-items-center gap-3">
-          <button type="button" class="btn btn-outline-dark btn-md px-4 ms-3">
-            Explora
-          </button>
+          <!-- Botón Explora -->
           <button
             type="button"
-            class="btn btn-outline-primary btn-md px-3"
+            class="btn btn-outline-dark btn-sm d-flex align-items-center gap-2 px-3"
+          >
+            <i class="fas fa-search"></i>
+            <span class="d-none d-sm-inline">Explora</span>
+          </button>
+
+          <!-- Botón Mensaje -->
+          <button
+            type="button"
+            class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2 px-3"
             title="Enviar Mensaje"
           >
-            <i class="fas fa-comments me-2"></i> Mensaje
+            <i class="fas fa-comments"></i>
+            <span class="d-none d-sm-inline">Mensaje</span>
           </button>
-          <form th:action="@{/logout}" method="post" th:csrf="true">
-            <button type="submit" class="btn btn-danger">Cerrar sesión</button>
+
+          <!-- Botón Cerrar sesión -->
+          <form th:action="@{/logout}" method="post" th:csrf="true" class="m-0">
+            <button
+              type="submit"
+              class="btn btn-danger btn-sm d-flex align-items-center gap-2 px-3"
+            >
+              <i class="fas fa-sign-out-alt"></i>
+              <span class="d-none d-sm-inline">Cerrar sesión</span>
+            </button>
           </form>
         </div>
       </div>
@@ -109,8 +131,28 @@
             <td
               th:text="${#strings.abbreviate(proyecto.descripcion, 100)}"
             ></td>
-            <td th:text="${proyecto.estado}" class="estado-proyecto"></td>
-            <td>
+
+            <!-- Estado con badge sobrio y tolerante a null -->
+            <td
+              th:with="ep=${proyecto.estadoProyecto != null ? proyecto.estadoProyecto.name() : 'PUBLICADO'}"
+            >
+              <span
+                class="badge rounded-pill"
+                th:classappend="${
+                ep == 'PUBLICADO'   ? ' bg-secondary-subtle text-secondary-emphasis' :
+                ep == 'EN_PROGRESO' ? ' bg-primary-subtle text-primary-emphasis'   :
+                ep == 'CANCELADO'   ? ' bg-secondary'                               :
+                                      ' bg-success-subtle text-success-emphasis'
+              }"
+                th:text="${#strings.capitalize(ep.toLowerCase().replace('_',' '))}"
+              >
+              </span>
+            </td>
+
+            <!-- Acciones -->
+            <td
+              th:with="ep=${proyecto.estadoProyecto != null ? proyecto.estadoProyecto.name() : 'PUBLICADO'}"
+            >
               <div class="dropdown">
                 <button
                   class="btn btn-outline-dark btn-sm dropdown-toggle"
@@ -120,14 +162,49 @@
                   Acciones
                 </button>
                 <ul class="dropdown-menu">
-                  <li>
-                    <button
-                      class="dropdown-item"
-                      th:id="'estado-btn-' + ${proyecto.id}"
-                      th:text="${proyecto.estado == 'Abierto' ? 'Cerrar' : 'Abrir'}"
-                      th:onclick="'cambiarEstado(this, ' + ${proyecto.id} + ')'"
-                    ></button>
+                  <!-- Cerrar = Cancelar (solo PUBLICADO) -->
+                  <li th:if="${ep == 'PUBLICADO'}">
+                    <form
+                      th:action="@{|/proyectos/empleador/${proyecto.id}/cancelar|}"
+                      method="post"
+                      class="px-3 py-1"
+                    >
+                      <!-- Renderiza el token SOLO si _csrf existe -->
+                      <th:block th:if="${_csrf != null}">
+                        <input
+                          type="hidden"
+                          th:name="${_csrf.parameterName}"
+                          th:value="${_csrf.token}"
+                        />
+                      </th:block>
+                      <button type="submit" class="dropdown-item text-danger">
+                        Cerrar
+                      </button>
+                    </form>
                   </li>
+
+                  <!-- Finalizar (solo EN_PROGRESO) -->
+                  <li th:if="${ep == 'EN_PROGRESO'}">
+                    <form
+                      th:action="@{|/proyectos/empleador/${proyecto.id}/finalizar|}"
+                      method="post"
+                      class="px-3 py-1"
+                    >
+                      <!-- Renderiza el token SOLO si _csrf existe -->
+                      <th:block th:if="${_csrf != null}">
+                        <input
+                          type="hidden"
+                          th:name="${_csrf.parameterName}"
+                          th:value="${_csrf.token}"
+                        />
+                      </th:block>
+                      <button type="submit" class="dropdown-item">
+                        Finalizar
+                      </button>
+                    </form>
+                  </li>
+
+                  <!-- Editar -->
                   <li>
                     <a
                       class="dropdown-item"
@@ -137,6 +214,8 @@
                       Editar
                     </a>
                   </li>
+
+                  <!-- Eliminar -->
                   <li>
                     <button
                       class="dropdown-item"
@@ -151,6 +230,7 @@
           </tr>
         </tbody>
       </table>
+
       <div class="d-flex justify-content-center mt-4">
         <nav aria-label="Paginación de proyectos">
           <ul class="pagination">
@@ -460,18 +540,17 @@
       class="toast-container position-fixed bottom-0 end-0 p-3"
     ></div>
 
-<div class="d-flex justify-content-end mt-3">
-  <button
-    class="btn btn-sm btn-outline-dark px-3 me-4"
-    type="button"
-    data-bs-toggle="offcanvas"
-    data-bs-target="#historialPostulaciones"
-    aria-controls="historialPostulaciones"
-  >
-    <i class="bi bi-clock-history me-1"></i> Ver historial de decisiones
-  </button>
-</div>
-
+    <div class="d-flex justify-content-end mt-3">
+      <button
+        class="btn btn-sm btn-outline-dark px-3 me-4"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#historialPostulaciones"
+        aria-controls="historialPostulaciones"
+      >
+        <i class="bi bi-clock-history me-1"></i> Ver historial de decisiones
+      </button>
+    </div>
 
     <!-- PROPOSICIONES RECIBIDAS -->
     <section class="py-5">
@@ -579,11 +658,11 @@
                           </button>
                         </form>
 
-                        <!-- Evitar errores si no hay freelancer asociado -->
                         <a
                           th:if="${postulacion.freelancer != null}"
                           th:href="@{'/freelancer/perfil/' + ${postulacion.freelancer.idFreelancer} + '#formularioPerfil'}"
-                          class="btn btn-outline-primary"
+                          class="btn btn-outline-primary ver-cv-link"
+                          th:attr="data-visto-url=@{/postulaciones/{id}/visto(id=${postulacion.id})}"
                         >
                           Ver perfil
                         </a>
@@ -766,63 +845,139 @@
       </div>
     </section>
     <div
-  class="offcanvas offcanvas-end shadow-lg rounded-3"
-  tabindex="-1"
-  id="historialPostulaciones"
-  aria-labelledby="historialPostulacionesLabel"
->
-  <div class="offcanvas-header border-bottom">
-    <h5 class="offcanvas-title" id="historialPostulacionesLabel">
-      <i class="bi bi-clipboard-check me-2 text-muted"></i> Historial de Postulaciones
-    </h5>
-    <button
-      type="button"
-      class="btn-close text-reset"
-      data-bs-dismiss="offcanvas"
-      aria-label="Cerrar"
-    ></button>
-  </div>
-  <div class="offcanvas-body">
-    <div
-      th:each="postulacion : ${postulaciones}"
-      th:if="${postulacion.estado != 'Pendiente'}"
-      class="mb-4 border-bottom pb-2"
+      class="offcanvas offcanvas-end shadow-lg rounded-3"
+      tabindex="-1"
+      id="historialPostulaciones"
+      aria-labelledby="historialPostulacionesLabel"
     >
-      <!-- Proyecto -->
-      <p>
-        <i class="bi bi-file-earmark-text me-2 text-muted"></i>
-        <strong>Proyecto:</strong>
-        <span th:text="${postulacion.proyecto.titulo}"></span>
-      </p>
+      <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="historialPostulacionesLabel">
+          <i class="bi bi-clipboard-check me-2 text-muted"></i> Historial de
+          Postulaciones
+        </h5>
+        <button
+          type="button"
+          class="btn-close text-reset"
+          data-bs-dismiss="offcanvas"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <div
+          th:each="postulacion : ${postulaciones}"
+          th:if="${postulacion.estado != 'Pendiente'}"
+          class="mb-4 border-bottom pb-2"
+        >
+          <!-- Proyecto -->
+          <p>
+            <i class="bi bi-file-earmark-text me-2 text-muted"></i>
+            <strong>Proyecto:</strong>
+            <span th:text="${postulacion.proyecto.titulo}"></span>
+          </p>
 
-      <!-- Freelancer -->
-      <p>
-        <i class="bi bi-person-circle me-2 text-muted"></i>
-        <strong>Freelancer:</strong>
-        <span th:text="${postulacion.nombreFreelancer}"></span>
-      </p>
+          <!-- Freelancer -->
+          <p>
+            <i class="bi bi-person-circle me-2 text-muted"></i>
+            <strong>Freelancer:</strong>
+            <span th:text="${postulacion.nombreFreelancer}"></span>
+          </p>
 
-      <!-- Monto (solo si está presente) -->
-      <p th:if="${postulacion.montoPropuesto != null}">
-        <i class="bi bi-cash-stack me-2 text-muted"></i>
-        <strong>Monto:</strong> S/
-        <span th:text="${postulacion.montoPropuesto}"></span>
-      </p>
+          <!-- Monto (solo si está presente) -->
+          <p th:if="${postulacion.montoPropuesto != null}">
+            <i class="bi bi-cash-stack me-2 text-muted"></i>
+            <strong>Monto:</strong> S/
+            <span th:text="${postulacion.montoPropuesto}"></span>
+          </p>
 
-      <!-- Estado -->
-      <p>
-        <i class="bi bi-check-circle me-2 text-muted"></i>
-        <strong>Estado:</strong>
-        <span class="badge"
-          th:classappend="${postulacion.estado == 'Aceptada' ? 'bg-success' : (postulacion.estado == 'Rechazada' ? 'bg-danger' : 'bg-warning')}"
-          th:text="${postulacion.estado}"></span>
-      </p>
+          <!-- Estado -->
+          <p>
+            <i class="bi bi-check-circle me-2 text-muted"></i>
+            <strong>Estado:</strong>
+            <span
+              class="badge"
+              th:classappend="${postulacion.estado == 'Aceptada' ? 'bg-success' : (postulacion.estado == 'Rechazada' ? 'bg-danger' : 'bg-warning')}"
+              th:text="${postulacion.estado}"
+            ></span>
+          </p>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script th:src="@{/js/tabla.js}"></script>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-light pt-5 pb-4">
+      <div class="container">
+        <div class="row gy-4">
+          <!-- Logo / Marca -->
+          <div class="col-md-4 text-center text-md-start">
+            <h5 class="fw-bold">Workeando</h5>
+            <p class="small">
+              Conectamos talento con oportunidades. Encuentra proyectos, postula
+              y haz crecer tu carrera freelance.
+            </p>
+          </div>
+
+          <!-- Enlaces rápidos -->
+          <div class="col-md-4 text-center">
+            <h6 class="fw-semibold mb-3">Enlaces</h6>
+            <ul class="list-unstyled small">
+              <li>
+                <a href="#" class="text-light text-decoration-none"
+                  >Proyectos</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-light text-decoration-none"
+                  >Cómo funciona</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-light text-decoration-none">Soporte</a>
+              </li>
+              <li>
+                <a href="#" class="text-light text-decoration-none"
+                  >Política de privacidad</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- Contacto -->
+          <div class="col-md-4 text-center text-md-end">
+            <h6 class="fw-semibold mb-3">Contáctanos</h6>
+            <p class="small mb-1">
+              <i class="fas fa-envelope me-2"></i> soporte@workeando.com
+            </p>
+            <p class="small mb-1">
+              <i class="fas fa-phone me-2"></i> +51 987 654 321
+            </p>
+            <div class="mt-2">
+              <a href="#" class="text-light me-3"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a href="#" class="text-light me-3"
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+              <a href="#" class="text-light"><i class="fab fa-twitter"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-light my-4" />
+
+        <!-- Derechos -->
+        <div class="row">
+          <div class="col text-center small">
+            <p class="mb-0">
+              &copy; 2025 <strong>Workeando</strong> | Todos los derechos
+              reservados
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

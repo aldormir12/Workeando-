@@ -1,5 +1,6 @@
 package com.workeando.plataform.serviceimpl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,8 @@ import com.workeando.plataform.model.Postulacion;
 import com.workeando.plataform.model.Proyecto;
 import com.workeando.plataform.repository.PostulacionRepository;
 import com.workeando.plataform.service.PostulacionService;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class PostulacionServiceImpl implements PostulacionService {
@@ -57,11 +60,11 @@ public class PostulacionServiceImpl implements PostulacionService {
     @Transactional
     public void aceptarPostulacion(Long idPostulacion) {
         Postulacion postulacion = postulacionRepository.findById(idPostulacion)
-                .orElseThrow(() -> new RuntimeException("Postulación no encontrada"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Postulación no encontrada"));
 
         Proyecto proyecto = postulacion.getProyecto();
 
-        if (!proyecto.getEstado().equals("Abierto")) {
+        if (!"Abierto".equalsIgnoreCase(proyecto.getEstado())) {
             throw new IllegalStateException("El proyecto está cerrado y no puede aceptar postulaciones");
         }
 
@@ -69,29 +72,56 @@ public class PostulacionServiceImpl implements PostulacionService {
             throw new IllegalStateException("El proyecto no está en estado PUBLICADO");
         }
 
-        // Cambiar estado del proyecto
-        proyecto.setEstadoProyecto(EstadoProyecto.EN_PROGRESO);
+        if (!Boolean.TRUE.equals(postulacion.getFinalista())) {
+            postulacion.setFinalista(true);
+        }
 
-        // Cambiar estado de la postulación
-        postulacion.setEstado("Aceptada");
+        if (!"Aceptada".equalsIgnoreCase(String.valueOf(postulacion.getEstado()))) {
+            postulacion.setEstado("Aceptada");
+        }
+
+        if (proyecto.getEstadoProyecto() == EstadoProyecto.PUBLICADO) {
+            proyecto.setEstadoProyecto(EstadoProyecto.EN_PROGRESO);
+        }
 
         // Guardar cambios
         postulacionRepository.save(postulacion);
+
     }
 
     @Override
-@Transactional
-public void rechazarPostulacion(Long idPostulacion) {
-    Postulacion postulacion = postulacionRepository.findById(idPostulacion)
-            .orElseThrow(() -> new RuntimeException("Postulación no encontrada"));
+    @Transactional
+    public void rechazarPostulacion(Long idPostulacion) {
+        Postulacion postulacion = postulacionRepository.findById(idPostulacion)
+                .orElseThrow(() -> new RuntimeException("Postulación no encontrada"));
 
-    if (!postulacion.getEstado().equals("Pendiente")) {
-        throw new IllegalStateException("Solo se pueden rechazar postulaciones pendientes");
+        if (!postulacion.getEstado().equals("Pendiente")) {
+            throw new IllegalStateException("Solo se pueden rechazar postulaciones pendientes");
+        }
+
+        postulacion.setEstado("Rechazada");
+
+        postulacionRepository.save(postulacion);
     }
 
-    postulacion.setEstado("Rechazada");
+    @Transactional
+    @Override
+    public void marcarVisto(Long id) {
+        Postulacion p = postulacionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Postulación no encontrada"));
+        if (Boolean.TRUE.equals(p.getCvVisto()))
+            return; // idempotente
+        p.setCvVisto(true);
+        p.setCvVistoAt(LocalDateTime.now());
+        postulacionRepository.save(p);
+    }
 
-    postulacionRepository.save(postulacion);
-}
-
+    @Transactional
+    @Override
+    public void marcarFinalista(Long id, boolean valor) {
+        Postulacion p = postulacionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Postulación no encontrada"));
+        p.setFinalista(valor);
+        postulacionRepository.save(p);
+    }
 }

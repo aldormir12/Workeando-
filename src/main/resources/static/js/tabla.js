@@ -358,3 +358,92 @@ document.addEventListener("DOMContentLoaded", () => {
     if (span) span.textContent = `(${traduccion})`;
   });
 });
+
+// Manejo de Aceptar/Rechazar postulaciones con soft-fail si el proyecto fue eliminado
+document.addEventListener("submit", async function (e) {
+  const form = e.target;
+  // Solo formularios de postulaciones
+  if (!form.action.includes("/postulaciones/") || !/(aceptar|rechazar)$/.test(form.action)) return;
+
+  e.preventDefault();
+
+  // "Tarjeta" de la postulación (el contenedor grande de cada propuesta)
+  const card = form.closest("[th\\:each], .border.rounded.px-4.py-3") || form.closest(".border.rounded");
+  const buttonsBox = card ? card.querySelector(".action-buttons") : null;
+
+  // Bloquea los botones para evitar doble click
+  if (buttonsBox) {
+    buttonsBox.querySelectorAll("button").forEach(b => { b.disabled = true; b.style.opacity = ".5"; });
+  }
+
+  try {
+    const res = await fetch(form.action, { method: form.method || "POST", headers: { "Accept": "application/json" } });
+
+    // 200/OK → acción exitosa: quitar tarjeta
+    if (res.ok) {
+      if (card) card.remove();
+      if (typeof mostrarToast === "function") mostrarToast("Acción realizada", "success");
+      return;
+    }
+
+    // 410 → proyecto eliminado | 404 → postulación ya no existe
+    if (res.status === 410 || res.status === 404) {
+      // Mensaje inline + botón Recargar
+      const alerta = document.createElement("div");
+      alerta.className = "alert alert-light border mt-2";
+      alerta.textContent = res.status === 410
+        ? "Este proyecto fue eliminado. La postulación ya no existe."
+        : "Esta postulación ya no existe.";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn btn-sm btn-outline-dark ms-2";
+      btn.textContent = "Recargar";
+      btn.addEventListener("click", () => location.reload());
+      alerta.appendChild(btn);
+
+      // Inserta la alerta al final del contenido de la tarjeta
+      const contentAnchor = card?.querySelector(".text-end") || card;
+      contentAnchor?.appendChild(alerta);
+
+      if (typeof mostrarToast === "function") {
+        mostrarToast(res.status === 410 ? "Proyecto eliminado" : "Postulación inexistente", "warning");
+      }
+      return;
+    }
+
+    // Otros errores → mensaje genérico y mantener tarjeta deshabilitada
+    if (typeof mostrarToast === "function") mostrarToast("No se pudo procesar la acción.", "danger");
+  } catch (_) {
+    if (typeof mostrarToast === "function") mostrarToast("Error de red. Intente recargar.", "danger");
+  }
+});
+// === CSRF helpers ===
+function getCsrf() {
+  const token = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+  const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+  return { token, header };
+}
+
+
+function getCsrf() {
+  const token = document.querySelector('meta[name="_csrf"]')?.content;
+  const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+  return { token, header };
+}
+
+async function marcarCvVistoPorLink(linkEl) {
+  const url = linkEl.getAttribute('data-visto-url');
+  if (!url) return;
+  const { token, header } = getCsrf();
+  const opts = { method: 'POST', headers: { 'Accept': 'application/json' } };
+  if (token && header) opts.headers[header] = token;
+  try { await fetch(url, opts); } catch {}
+}
+
+document.addEventListener('click', async (ev) => {
+  const link = ev.target.closest('a.ver-cv-link');
+  if (!link) return;
+  ev.preventDefault();
+  await marcarCvVistoPorLink(link);
+  window.location.href = link.href;
+});

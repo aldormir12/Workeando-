@@ -17,6 +17,6 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("proyectos", proyectoService.listarTodos());
-        return "home";  // Esto busca home.html en templates
+        return "home";
     }
 }

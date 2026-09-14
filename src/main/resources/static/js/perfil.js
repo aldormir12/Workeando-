@@ -412,28 +412,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener("DOMContentLoaded", () => {
   const fileInput = document.getElementById("cvFile");
-  const label = fileInput.closest("label");
-  const textP = label.querySelector("p.mt-3");
+  const textP = document.getElementById("cvFileText");
   const icono = document.getElementById("iconoCv");
 
+  if (!fileInput) return;
+
   fileInput.addEventListener("change", () => {
-    const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "";
+    const fileName = fileInput.files.length ? fileInput.files[0].name : "";
 
-    // Cambiar texto
-    textP.textContent = fileName
-      ? `Archivo seleccionado: ${fileName}`
-      : "Haz clic para seleccionar tu archivo";
+    if (textP) {
+      textP.textContent = fileName
+        ? `Archivo seleccionado: ${fileName}`
+        : "Haz clic para seleccionar tu archivo";
+    }
 
-    // Cambiar ícono a documento Word si hay archivo
-    if (fileName && icono) {
-      icono.classList.remove("bi-upload");
-      icono.classList.add("bi-file-earmark-word");
-    } else if (icono) {
-      icono.classList.remove("bi-file-earmark-word");
-      icono.classList.add("bi-upload");
+    if (icono) {
+      if (fileName) {
+        icono.classList.remove("bi-upload");
+        icono.classList.add("bi-file-earmark-word");
+      } else {
+        icono.classList.remove("bi-file-earmark-word");
+        icono.classList.add("bi-upload");
+      }
     }
   });
 });
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const pantalla = document.getElementById("pantallaSeleccion");

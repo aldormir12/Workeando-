@@ -121,9 +121,11 @@
       <!-- Sección para subir CV (oculta al inicio) -->
       <div id="seccionSubirCv" class="d-none fade-in mt-5">
         <div class="text-center mb-4">
-          <h4 class="fw-bold text-primary">Sube tu CV</h4>
-          <p class="text-muted">
-            Selecciona un archivo PDF o DOCX de tu currículum.
+          <h4 class="fw-semibold text-dark mb-2">Sube tu CV</h4>
+          <p class="text-secondary small mb-0">
+            Selecciona un archivo en formato
+            <span class="fw-medium">PDF</span> o
+            <span class="fw-medium">DOCX</span>.
           </p>
         </div>
 
@@ -136,17 +138,27 @@
           style="max-width: 500px; margin: auto"
         >
           <div class="mb-3">
-            <input
-              type="file"
-              class="form-control"
-              id="cvFile"
-              name="cvFile"
-              accept=".pdf,.doc,.docx"
-              required
-            />
+            <div
+              class="border border-2 rounded p-4 text-center bg-light d-flex flex-column justify-content-center align-items-center"
+              style="min-height: 160px; cursor: pointer"
+              onclick="document.getElementById('cvFile').click()"
+            >
+              <i id="iconoCv" class="bi bi-upload fs-2 mb-2 text-secondary"></i>
+              <p id="cvFileText" class="text-muted mb-2">
+                Haz clic o arrastra tu archivo aquí
+              </p>
+              <input
+                type="file"
+                class="d-none"
+                id="cvFile"
+                name="cvFile"
+                accept=".pdf,.doc,.docx"
+                required
+              />
+            </div>
           </div>
 
-          <div class="d-flex justify-content-between">
+          <div class="d-flex justify-content-between mt-3">
             <button
               type="button"
               class="btn btn-outline-secondary"
@@ -154,12 +166,12 @@
             >
               ← Volver
             </button>
-            <button type="submit" class="btn btn-primary">Subir CV</button>
+            <button type="submit" class="btn btn-dark">Subir CV</button>
           </div>
         </form>
       </div>
 
-        <!-- Overlay de carga -->
+      <!-- Overlay de carga -->
       <div
         id="cvOverlayCarga"
         class="d-none position-fixed top-0 start-0 w-100 h-100 z-50 d-flex flex-column justify-content-center align-items-center"
@@ -431,7 +443,7 @@
 
               <div id="idiomasContainer">
                 <!-- MODO SOLO LECTURA -->
-<div th:if="${soloLectura != null and soloLectura}">
+                <div th:if="${soloLectura != null and soloLectura}">
                   <div
                     th:each="idioma : *{idiomas}"
                     class="border rounded p-3 mb-2 bg-light"
