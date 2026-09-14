@@ -1,1 +1,1 @@
-Estrategia de integracion: cambios directos sobre la rama principal.
+Estrategia de integracion: desarrollo mediante ramas feature, revision de cambios y posterior fusion controlada con la rama principal.
