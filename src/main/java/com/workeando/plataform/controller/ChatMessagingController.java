@@ -1,11 +1,12 @@
 package com.workeando.plataform.controller;
 
-import com.workeando.plataform.dto.ChatMessageDTO;
-import com.workeando.plataform.model.Chat;
-import com.workeando.plataform.service.ChatService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+
+import com.workeando.plataform.dto.ChatMessageDTO;
+import com.workeando.plataform.model.Chat;
+import com.workeando.plataform.service.ChatService;
 
 @Controller
 public class ChatMessagingController {

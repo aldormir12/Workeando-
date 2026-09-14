@@ -1,23 +1,30 @@
 package com.workeando.plataform.controller;
 
-import com.workeando.plataform.model.Postulacion;
-import com.workeando.plataform.model.Proyecto;
-import com.workeando.plataform.repository.PostulacionRepository;
-import com.workeando.plataform.service.CategoriaService;
-import com.workeando.plataform.service.PostulacionService;
-import com.workeando.plataform.service.ProyectoService;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication; //info del usuario autenticado
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
-import java.util.Map;
+import com.workeando.plataform.model.Calificacion;
+import com.workeando.plataform.model.Postulacion;
+import com.workeando.plataform.model.Proyecto;
+import com.workeando.plataform.repository.CalificacionRepository;
+import com.workeando.plataform.repository.PostulacionRepository;
+import com.workeando.plataform.service.CategoriaService;
+import com.workeando.plataform.service.PostulacionService;
+import com.workeando.plataform.service.ProyectoService;
 
 @Controller
 public class EmpleadorController {
@@ -27,14 +34,23 @@ public class EmpleadorController {
     private final CategoriaService categoriaService;
     private final PostulacionService postulacionService;
 
+    // NUEVO ↓↓↓
+    private final CalificacionRepository calificacionRepository;
+    // NUEVO ↑↑↑
+
     @Autowired
-    public EmpleadorController(ProyectoService proyectoService, PostulacionRepository postulacionRepository,
-            CategoriaService categoriaService, PostulacionService postuuService) {
+    public EmpleadorController(
+            ProyectoService proyectoService,
+            PostulacionRepository postulacionRepository,
+            CategoriaService categoriaService,
+            PostulacionService postuuService,
+            CalificacionRepository calificacionRepository // <-- NUEVO
+    ) {
         this.proyectoService = proyectoService;
         this.postulacionRepository = postulacionRepository;
         this.categoriaService = categoriaService;
         this.postulacionService = postuuService;
-
+        this.calificacionRepository = calificacionRepository; // <-- NUEVO
     }
 
     // Vista principal del empleador con sus proyectos
@@ -63,14 +79,34 @@ public class EmpleadorController {
 
         model.addAttribute("categorias", categoriaService.listarTodas());
 
+        // ----------------------------------------------------
+        // 🔥 NUEVO: RATING DEL EMPLEADOR
+        // ----------------------------------------------------
+        List<Calificacion> califsEmpleador =
+                calificacionRepository.findByContrato_Postulacion_Proyecto_CreadorCorreo(correo);
+
+        double ratingPromedio = 0.0;
+        int ratingTotal = califsEmpleador.size();
+
+        if (ratingTotal > 0) {
+            int suma = califsEmpleador.stream()
+                    .mapToInt(Calificacion::getPuntuacion)
+                    .sum();
+            ratingPromedio = (double) suma / ratingTotal;
+        }
+
+        model.addAttribute("ratingPromedio", ratingPromedio);
+        model.addAttribute("ratingTotal", ratingTotal);
+        // ----------------------------------------------------
+
         return "emple";
     }
 
     // Publicar un nuevo proyecto
     @PostMapping("/empleador/publicar")
     public String publicarProyecto(@ModelAttribute Proyecto proyecto, Authentication authentication) {
-        String correo = authentication.getName(); // obtener correo del empleador
-        proyecto.setCreadorCorreo(correo); // asignarlo al proyecto
+        String correo = authentication.getName();
+        proyecto.setCreadorCorreo(correo);
 
         if (proyecto.getFechaInicio() != null && proyecto.getFechaFinal() != null) {
             if (proyecto.getFechaInicio().isAfter(proyecto.getFechaFinal())) {
@@ -125,7 +161,6 @@ public class EmpleadorController {
         Proyecto proyectoOriginal = proyectoService.buscarPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
 
-        // Actualizar campos
         proyectoOriginal.setTitulo(proyectoEditado.getTitulo());
         proyectoOriginal.setDescripcion(proyectoEditado.getDescripcion());
         proyectoOriginal.setCategoria(proyectoEditado.getCategoria());
@@ -147,6 +182,6 @@ public class EmpleadorController {
         String correoEmpleador = authentication.getName();
         List<Postulacion> postulaciones = postulacionRepository.findByProyectoCreadorCorreo(correoEmpleador);
         model.addAttribute("postulaciones", postulaciones);
-        return "postulaciones-empleador"; // Vista a crear
+        return "postulaciones-empleador";
     }
 }

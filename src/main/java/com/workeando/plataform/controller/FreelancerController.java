@@ -1,38 +1,43 @@
 package com.workeando.plataform.controller;
 
-import com.workeando.plataform.model.ExperienciaLaboral;
-import com.workeando.plataform.model.Freelancer;
-import com.workeando.plataform.model.Postulacion;
-import com.workeando.plataform.model.Usuario;
-import com.workeando.plataform.model.Proyecto;
-import com.workeando.plataform.service.FreelancerService;
-import com.workeando.plataform.service.PostulacionService;
-import com.workeando.plataform.service.ProyectoService;
-import com.workeando.plataform.service.UsuarioService;
-import com.workeando.plataform.service.FypService;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map; // <-- NUEVO
+import java.util.Optional;
 
-//import com.workeando.plataform.service.PostulacionService;
-
-import jakarta.validation.Valid;
-
-import com.workeando.plataform.service.CategoriaService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.BindingResult; // <-- NUEVO
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.text.ParseException;
-import java.util.Date;
+import com.workeando.plataform.model.Calificacion;
+import com.workeando.plataform.model.ExperienciaLaboral;
+import com.workeando.plataform.model.Freelancer;
+import com.workeando.plataform.model.Postulacion;
+import com.workeando.plataform.model.Proyecto;
+import com.workeando.plataform.model.Usuario;
+import com.workeando.plataform.repository.CalificacionRepository;
+import com.workeando.plataform.service.CategoriaService;
+import com.workeando.plataform.service.FreelancerService;
+import com.workeando.plataform.service.FypService;
+import com.workeando.plataform.service.PostulacionService;
+import com.workeando.plataform.service.ProyectoService;
+import com.workeando.plataform.service.UsuarioService;
+
+import jakarta.validation.Valid;
 
 @Controller
 public class FreelancerController {
@@ -44,24 +49,30 @@ public class FreelancerController {
     private final CategoriaService categoriaService;
     private final PostulacionService postulacionService;
 
+    // ⬇️⬇️ NUEVO: inyectar CalificacionRepository
+    private final CalificacionRepository calificacionRepository;
+
     public FreelancerController(ProyectoService proyectoService,
             FreelancerService freelancerService,
             UsuarioService usuarioService,
             CategoriaService categoriaService,
             PostulacionService postulacionService,
-            FypService fypService) {
+            FypService fypService,
+            CalificacionRepository calificacionRepository) { // <-- NUEVO
         this.proyectoService = proyectoService;
         this.freelancerService = freelancerService;
         this.usuarioService = usuarioService;
         this.categoriaService = categoriaService;
         this.postulacionService = postulacionService;
         this.fypService = fypService;
+        this.calificacionRepository = calificacionRepository; // <-- NUEVO
     }
 
     @GetMapping("/free")
     public String freelancerPage(@RequestParam(required = false) String categoria,
             Model model,
             Authentication authentication) {
+
         // Obtiene el correo del usuario autenticado
         String email = authentication.getName();
 
@@ -74,7 +85,6 @@ public class FreelancerController {
         model.addAttribute("tienePerfil", tienePerfil);
 
         if (!tienePerfil) {
-            // Crear perfil por defecto
             Freelancer perfilPorDefecto = new Freelancer();
             perfilPorDefecto.setUsuario(usuario);
             perfilPorDefecto.setTelefono("");
@@ -83,17 +93,14 @@ public class FreelancerController {
             perfilPorDefecto.setPortafolio("");
             perfilPorDefecto.setEsPerfilPorDefecto(true);
 
-            // Guardar perfil por defecto
             freelancerService.guardarFreelancer(perfilPorDefecto);
 
-            // Enviar al modelo
             model.addAttribute("freelancer", perfilPorDefecto);
             model.addAttribute("alertaPerfil",
                     "Tu perfil ha sido creado automáticamente con información básica. ¡Completa tu perfil para mejorar tus posibilidades de ser elegido!");
             model.addAttribute("esPerfilPorDefecto", true);
 
         } else {
-            // Perfil ya existe, cargarlo
             Freelancer freelancer = freelancerService.buscarPorUsuario(usuario).get();
 
             model.addAttribute("freelancer", freelancer);
@@ -107,7 +114,27 @@ public class FreelancerController {
             }
         }
 
-        // Decidir si usar FYP (perfil existente y no por defecto)
+        // 🔥🔥 NUEVO: Cargar calificaciones del FREELANCER
+        List<Calificacion> califsFreelancer =
+                calificacionRepository.findByContrato_Postulacion_Freelancer_Usuario_Id(usuario.getId());
+
+        double ratingPromedio = 0.0;
+        int ratingTotal = califsFreelancer.size();
+
+        if (ratingTotal > 0) {
+            int suma = califsFreelancer.stream()
+                    .mapToInt(Calificacion::getPuntuacion)
+                    .sum();
+            ratingPromedio = (double) suma / ratingTotal;
+        }
+
+        // Enviar al modelo
+        model.addAttribute("ratingPromedio", ratingPromedio);
+        model.addAttribute("ratingTotal", ratingTotal);
+        // 🔥🔥 FIN NUEVO
+
+
+        // Decide si usar FYP
         boolean usarFyp = false;
         if (tienePerfil) {
             Optional<Freelancer> fOpt = freelancerService.buscarPorUsuario(usuario);
@@ -134,6 +161,10 @@ public class FreelancerController {
         return "free";
     }
 
+    // -----------------------------
+    // (RESTO DE TU CONTROLADOR SIN CAMBIOS)
+    // -----------------------------
+
     @GetMapping("/free/perfil")
     public String mostrarFormularioPerfil(
             @RequestParam(name = "modoEdicion", required = false, defaultValue = "false") boolean modoEdicion,
@@ -150,7 +181,6 @@ public class FreelancerController {
             freelancer.setUsuario(usuario);
         }
 
-        // Solo agregar campos vacíos si no hay datos cargados
         if (freelancer.getIdiomas().isEmpty()) {
             freelancer.getIdiomas().add(new com.workeando.plataform.model.Idioma());
         }
@@ -161,8 +191,7 @@ public class FreelancerController {
             freelancer.getExperienciaLaboral().add(new com.workeando.plataform.model.ExperienciaLaboral());
         }
 
-        model.addAttribute("soloLectura", false); // Freelancer puede editar
-
+        model.addAttribute("soloLectura", false);
         model.addAttribute("freelancer", freelancer);
         model.addAttribute("categorias", categoriaService.listarTodas());
         model.addAttribute("habilidadesDisponibles", obtenerHabilidadesDisponibles());
@@ -181,7 +210,6 @@ public class FreelancerController {
 
         System.out.println(" MÉTODO guardarPerfil INVOCADO");
 
-        // Validación: mínimo una categoría
         if (freelancer.getCategorias() == null || freelancer.getCategorias().isEmpty()) {
             result.rejectValue("categorias", "error.categorias", "Debes seleccionar al menos una categoría");
             model.addAttribute("categorias", categoriaService.listarTodas());
@@ -189,7 +217,6 @@ public class FreelancerController {
             return "crearPerfil";
         }
 
-        // Validación: URL del portafolio (si existe)
         if (freelancer.getPortafolio() != null && !freelancer.getPortafolio().isBlank()) {
             String urlRegex = "^(https?://)?[\\w.-]+(?:\\.[\\w\\.-]+)+[/#?]?.*$";
             if (!freelancer.getPortafolio().matches(urlRegex)) {
@@ -199,7 +226,6 @@ public class FreelancerController {
             }
         }
 
-        // Validación: fechas de experiencia laboral
         SimpleDateFormat sdf = new SimpleDateFormat("MM/yyyy");
         Date fechaActual = new Date();
         String fechaRegex = "^\\d{2}/\\d{4}$";
@@ -249,16 +275,13 @@ public class FreelancerController {
             }
         }
 
-        // Obtener usuario autenticado
         String email = authentication.getName();
         Usuario usuario = usuarioService.buscarPorCorreo(email);
 
-        // Buscar si ya existe perfil
         Optional<Freelancer> existenteOpt = freelancerService.buscarPorUsuario(usuario);
         Freelancer freelancerPersistente;
 
         if (existenteOpt.isPresent()) {
-            // Modo edición
             freelancerPersistente = existenteOpt.get();
 
             freelancerPersistente.setTelefono(freelancer.getTelefono());
@@ -270,25 +293,18 @@ public class FreelancerController {
             freelancerPersistente.getHabilidadesTecnicas().clear();
             freelancerPersistente.getHabilidadesTecnicas().addAll(freelancer.getHabilidadesTecnicas());
             freelancerPersistente.setExperienciaLaboral(freelancer.getExperienciaLaboral());
-
-            // Actualiza el estado de perfil por defecto a falso si ya está completo
             freelancerPersistente.setEsPerfilPorDefecto(false);
 
         } else {
-            // Modo creación
             freelancerPersistente = freelancer;
             freelancerPersistente.setUsuario(usuario);
-
-            // Asignar el perfil por defecto si es el primer perfil
-            freelancerPersistente.setEsPerfilPorDefecto(false); // Cambiar a false al completar el perfil
+            freelancerPersistente.setEsPerfilPorDefecto(false);
         }
 
-        // Guardar perfil
         freelancerService.guardarFreelancer(freelancerPersistente);
 
-        // Mensaje de éxito
         redirectAttributes.addFlashAttribute("toastExito", "Tu perfil ha sido guardado con éxito.");
-        return "redirect:/free"; // Redirige a la página de inicio
+        return "redirect:/free";
     }
 
     @PostMapping("/free/subirCv")
@@ -327,7 +343,7 @@ public class FreelancerController {
             model.addAttribute("toastExito", "Datos del CV cargados. Por favor, completa o ajusta la información.");
             model.addAttribute("cvProcesado", true);
 
-            return "crearPerfil"; // Mostrar la vista con los datos cargados
+            return "crearPerfil";
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -369,10 +385,9 @@ public class FreelancerController {
         model.addAttribute("modoEdicion", false);
         model.addAttribute("soloLectura", true);
 
-        return "crearPerfil"; // reutilizamos el mismo formulario
+        return "crearPerfil";
     }
 
-    // Endpoint REST: obtener detalles de un proyecto en formato JSON
     @GetMapping("/api/proyectos/{id}")
     @ResponseBody
     public ResponseEntity<?> obtenerProyectoPorId(@PathVariable Long id) {
@@ -398,7 +413,6 @@ public class FreelancerController {
     }
 
     public List<String> obtenerIdiomasDisponibles() {
-
         return List.of("Español", "Inglés", "Francés", "Alemán");
     }
 
@@ -410,7 +424,6 @@ public class FreelancerController {
                 "Kubernetes", "Node", "HTML", "CSS", "JavaScript", "Python", "C#", "C++");
     }
 
-    // Endpoint REST: filtrar proyectos por categoría
     @GetMapping("/api/proyectos")
     @ResponseBody
     public List<Proyecto> obtenerProyectosPorCategoria(@RequestParam(required = false) String categoria) {

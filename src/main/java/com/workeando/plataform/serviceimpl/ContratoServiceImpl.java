@@ -35,4 +35,10 @@ public class ContratoServiceImpl implements ContratoService {
     public void eliminar(Integer id) {
         contratoRepository.deleteById(id);
     }
+
+    // NUEVO: buscar contrato por id de la postulación
+    @Override
+    public Optional<Contrato> buscarPorPostulacionId(Long postulacionId) {
+        return contratoRepository.findByPostulacionId(postulacionId);
+    }
 }

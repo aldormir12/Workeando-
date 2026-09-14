@@ -6,9 +6,15 @@ import java.util.Optional;
 import com.workeando.plataform.model.Contrato;
 
 public interface ContratoService {
-    List<Contrato> listarTodos();
-    Optional<Contrato> buscarPorId(Integer id);
-    Contrato guardar(Contrato contrato);
-    void eliminar(Integer id);
-}
 
+    List<Contrato> listarTodos();
+
+    Optional<Contrato> buscarPorId(Integer id);
+
+    Contrato guardar(Contrato contrato);
+
+    void eliminar(Integer id);
+
+    // NUEVO: obtener el contrato asociado a una postulación
+    Optional<Contrato> buscarPorPostulacionId(Long postulacionId);
+}

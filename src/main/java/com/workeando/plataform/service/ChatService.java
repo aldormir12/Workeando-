@@ -1,16 +1,18 @@
 package com.workeando.plataform.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.workeando.plataform.model.Chat;
 import com.workeando.plataform.model.Postulacion;
 import com.workeando.plataform.repository.ChatRepository;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @Transactional
@@ -55,6 +57,12 @@ public class ChatService {
     public List<Chat> listarMensajesPorPostulacion(Long postulacionId) {
         return chatRepository.findByPostulacion_IdOrderByFechaEnvioAsc(postulacionId);
     }
+
+    // Historial completo de una postulación
+    public List<Chat> obtenerHistorial(Long postulacionId) {
+        return chatRepository.findByPostulacion_IdOrderByFechaEnvioAsc(postulacionId);
+    }
+
 
     // Último mensaje de la postulación
     public Chat obtenerUltimoMensaje(Long postulacionId) {

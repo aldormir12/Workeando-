@@ -1,1128 +1,817 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Freelancer | Workeando</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/notificacionFlotante.css}" />
-  </head>
-  <body>
-    <!-- NAVBAR -->
-    <header class="bg-light">
-      <div
-        class="container-fluid d-flex justify-content-between align-items-center py-3"
-      >
-        <a
-          href="/"
-          class="logo text-dark fs-4 fw-bold"
-          style="text-decoration: none"
-          >Workeando</a
-        >
 
-        <div class="d-flex align-items-center gap-3">
-          <!-- Botón Perfil -->
-          <div th:if="${tienePerfil}" class="dropdown">
-            <button
-              class="btn btn-outline-dark btn-sm dropdown-toggle d-flex align-items-center gap-2 px-3"
-              type="button"
-              id="perfilDropdown"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              title="Opciones de perfil"
-            >
-              <i class="fas fa-user-circle"></i>
-              <span class="d-none d-sm-inline">Perfil</span>
-            </button>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Freelancer | Workeando</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/styles.css}" />
+  <link rel="stylesheet" th:href="@{/css/notificacionFlotante.css}" />
+</head>
 
-            <ul class="dropdown-menu" aria-labelledby="perfilDropdown">
-              <li>
-                <button
-                  class="dropdown-item d-flex align-items-center gap-2"
-                  type="button"
-                  data-bs-toggle="offcanvas"
-                  data-bs-target="#perfilOffcanvas"
-                  aria-controls="perfilOffcanvas"
-                >
-                  <i class="fas fa-id-card text-primary"></i> Ver perfil
-                </button>
-              </li>
-              <li>
-                <a
-                  class="dropdown-item d-flex align-items-center gap-2"
-                  href="/free/mis-postulaciones"
-                >
-                  <i class="fas fa-clipboard-list text-secondary"></i> Mis
-                  postulaciones
-                </a>
-              </li>
-            </ul>
-          </div>
+<body>
+  <!-- NAVBAR -->
+  <header class="bg-light">
+    <div class="container-fluid d-flex justify-content-between align-items-center py-3">
+      <a href="/" class="logo text-dark fs-4 fw-bold" style="text-decoration: none">Workeando</a>
 
-          <!-- Botón Mensaje -->
-          <button
-            type="button"
-            class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2 px-3"
-            title="Enviar Mensaje"
-          >
-            <i class="fas fa-comments"></i>
-            <span class="d-none d-sm-inline">Mensaje</span>
+      <div class="d-flex align-items-center gap-3">
+        <!-- Botón Perfil -->
+        <div th:if="${tienePerfil}" class="dropdown">
+          <button class="btn btn-outline-dark btn-sm dropdown-toggle d-flex align-items-center gap-2 px-3" type="button"
+            id="perfilDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Opciones de perfil">
+            <i class="fas fa-user-circle"></i>
+            <span class="d-none d-sm-inline">Perfil</span>
           </button>
 
-          <!-- Botón Cerrar sesión -->
-          <form th:action="@{/logout}" method="post" th:csrf="true" class="m-0">
-            <button
-              type="submit"
-              class="btn btn-danger btn-sm d-flex align-items-center gap-2 px-3"
-            >
-              <i class="fas fa-sign-out-alt"></i>
-              <span class="d-none d-sm-inline">Cerrar sesión</span>
-            </button>
-          </form>
+          <ul class="dropdown-menu" aria-labelledby="perfilDropdown">
+            <li>
+              <button class="dropdown-item d-flex align-items-center gap-2" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#perfilOffcanvas" aria-controls="perfilOffcanvas">
+                <i class="fas fa-id-card text-primary"></i> Ver perfil
+              </button>
+            </li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center gap-2" href="/free/mis-postulaciones">
+                <i class="fas fa-clipboard-list text-secondary"></i> Mis
+                postulaciones
+              </a>
+            </li>
+          </ul>
         </div>
-      </div>
-    </header>
 
-    <!-- HERO PRINCIPAL -->
-    <section
-      class="hero-section text-white d-flex align-items-center"
-      style="
+        <!-- Botón Mensaje -->
+        <a href="/chat" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2 px-3"
+          title="Bandeja de mensajes">
+          <i class="fas fa-comments"></i>
+          <span class="d-none d-sm-inline">Mensajes</span>
+        </a>
+
+
+        <!-- Botón Cerrar sesión -->
+        <form th:action="@{/logout}" method="post" th:csrf="true" class="m-0">
+          <button type="submit" class="btn btn-danger btn-sm d-flex align-items-center gap-2 px-3">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="d-none d-sm-inline">Cerrar sesión</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO PRINCIPAL -->
+  <section class="hero-section text-white d-flex align-items-center" style="
         background: url('/img/emple.jpg') no-repeat center center;
         background-size: cover;
         height: 100vh;
         position: relative;
-      "
-    >
-      <div
-        class="overlay"
-        style="
+      ">
+    <div class="overlay" style="
           position: absolute;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
           background: rgba(0, 0, 0, 0.5);
-        "
-      ></div>
+        "></div>
 
-      <!-- Contenido central -->
-      <div class="container text-center position-relative">
-        <h1 class="display-4 fw-bold mb-4">Bienvenido Freelancer</h1>
-        <p class="lead mb-4">
-          Explora proyectos y conecta con empleadores que buscan tus
-          habilidades. ¡Comienza a trabajar hoy mismo!
-        </p>
-      </div>
-    </section>
+    <!-- Contenido central -->
+    <div class="container text-center position-relative">
+      <h1 class="display-4 fw-bold mb-4">Bienvenido Freelancer</h1>
+      <p class="lead mb-4">
+        Explora proyectos y conecta con empleadores que buscan tus
+        habilidades. ¡Comienza a trabajar hoy mismo!
+      </p>
+    </div>
+  </section>
 
-    <!-- Alerta cuando el freelancer tiene un perfil por defecto -->
-    <div
-      th:if="${esPerfilPorDefecto}"
-      class="alert floating-alert alert-warning alert-dismissible fade show p-4 mb-4 rounded shadow-sm"
-      style="background-color: #f8f9fa; border: 1px solid #ced4da"
-    >
-      <div class="d-flex align-items-center">
-        <strong class="text-dark me-3">¡Atención!</strong>
-        <span th:text="${alertaPerfil}" class="text-muted"></span>
-      </div>
+  <!-- Alerta cuando el freelancer tiene un perfil por defecto -->
+  <div th:if="${esPerfilPorDefecto}"
+    class="alert floating-alert alert-warning alert-dismissible fade show p-4 mb-4 rounded shadow-sm"
+    style="background-color: #f8f9fa; border: 1px solid #ced4da">
+    <div class="d-flex align-items-center">
+      <strong class="text-dark me-3">¡Atención!</strong>
+      <span th:text="${alertaPerfil}" class="text-muted"></span>
+    </div>
 
-      <!-- Botón de completar perfil -->
-      <a
-        href="/free/perfil"
-        class="btn btn-outline-primary btn-sm ms-3"
-        style="
+    <!-- Botón de completar perfil -->
+    <a href="/free/perfil" class="btn btn-outline-primary btn-sm ms-3" style="
           border-color: #007bff;
           color: #007bff;
           padding-left: 12px;
           padding-right: 12px;
           font-size: 0.875rem;
           margin-top: 10px;
-        "
-      >
-        Completa tu perfil
-      </a>
+        ">
+      Completa tu perfil
+    </a>
 
-      <!-- Botón de cierre -->
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Cerrar"
-      ></button>
-    </div>
+    <!-- Botón de cierre -->
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+  </div>
 
-    <!-- PROYECTOS DISPONIBLES -->
-    <section id="proyectos" class="py-5">
-      <div class="container">
-        <div class="row mb-4">
-          <div class="col-12 d-flex justify-content-between align-items-center">
-            <div
-              class="d-flex align-items-start bg-light rounded p-3 mt-3 shadow-sm"
-            >
-              <p class="mb-0 text-body fs-5 fw-medium">
-                Explora las oportunidades que tenemos para ti. Conecta con
-                empleadores que buscan tu talento.
-              </p>
-            </div>
+  <!-- PROYECTOS DISPONIBLES -->
+  <section id="proyectos" class="py-5">
+    <div class="container">
+      <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-start bg-light rounded p-3 mt-3 shadow-sm">
+            <p class="mb-0 text-body fs-5 fw-medium">
+              Explora las oportunidades que tenemos para ti. Conecta con
+              empleadores que buscan tu talento.
+            </p>
+          </div>
 
-            <div class="dropdown mb-4">
-              <button
-                class="btn btn-outline-secondary btn-sm dropdown-toggle"
-                type="button"
-                id="dropdownCategoria"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i class="bi bi-filter"></i>
-                <span id="categoriaTexto">Filtrar por categorías</span>
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="dropdownCategoria">
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria=""
-                    data-categoria-id="0"
-                  >
-                    Todas las categorías
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria="Diseño"
-                    data-categoria-id="1"
-                  >
-                    Diseño
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria="Cocina y Gastronomía"
-                    data-categoria-id="2"
-                  >
-                    Cocina y Gastronomía
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria="Marketing"
-                    data-categoria-id="3"
-                  >
-                    Marketing
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria="Redacción"
-                    data-categoria-id="4"
-                  >
-                    Redacción
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria="Traducción"
-                    data-categoria-id="5"
-                  >
-                    Traducción
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria="Animales"
-                    data-categoria-id="6"
-                  >
-                    Animales
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria="Servicios generales"
-                    data-categoria-id="7"
-                  >
-                    Servicios generales
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria="Creativos y Arte"
-                    data-categoria-id="8"
-                  >
-                    Creativos y Arte
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria="Para turistas"
-                    data-categoria-id="9"
-                  >
-                    Para turistas
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria="Logística y Operaciones"
-                    data-categoria-id="10"
-                  >
-                    Logística y Operaciones
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria="Educación y Tutorías"
-                    data-categoria-id="11"
-                  >
-                    Educación y Tutorías
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item categoria-opcion"
-                    data-categoria="Tecnología y Desarrollo"
-                    data-categoria-id="12"
-                  >
-                    Tecnología y Desarrollo
-                  </a>
-                </li>
-              </ul>
-            </div>
+          <div class="dropdown mb-4">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="dropdownCategoria"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-filter"></i>
+              <span id="categoriaTexto">Filtrar por categorías</span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownCategoria">
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="" data-categoria-id="0">
+                  Todas las categorías
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="Diseño" data-categoria-id="1">
+                  Diseño
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="Cocina y Gastronomía" data-categoria-id="2">
+                  Cocina y Gastronomía
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="Marketing" data-categoria-id="3">
+                  Marketing
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="Redacción" data-categoria-id="4">
+                  Redacción
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="Traducción" data-categoria-id="5">
+                  Traducción
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="Animales" data-categoria-id="6">
+                  Animales
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="Servicios generales" data-categoria-id="7">
+                  Servicios generales
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="Creativos y Arte" data-categoria-id="8">
+                  Creativos y Arte
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="Para turistas" data-categoria-id="9">
+                  Para turistas
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="Logística y Operaciones"
+                  data-categoria-id="10">
+                  Logística y Operaciones
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="Educación y Tutorías" data-categoria-id="11">
+                  Educación y Tutorías
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item categoria-opcion" data-categoria="Tecnología y Desarrollo"
+                  data-categoria-id="12">
+                  Tecnología y Desarrollo
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
-        <div id="contenedorProyectos"></div>
       </div>
-    </section>
+      <div id="contenedorProyectos"></div>
+    </div>
+  </section>
 
-    <main class="container-fluid mt-4">
-      <div class="row">
-        <!-- Panel izquierdo: listado de trabajos -->
-        <div
-          class="col-md-4 bg-white border-end shadow-sm pe-0"
-          style="min-height: 400px"
-        >
-          <div
-            class="d-flex align-items-center justify-content-between mb-3 px-3"
-          >
-            <!-- Encabezado dinámico -->
-            <h5
-              class="fw-semibold text-dark m-0 d-flex align-items-center gap-2"
-            >
-              <!-- Ícono base -->
-              <i
-                th:if="${!tienePerfil} or ${esPerfilPorDefecto}"
-                class="fas fa-briefcase text-secondary"
-              ></i>
-              <i
-                th:if="${tienePerfil} and ${esPerfilPorDefecto == false}"
-                class="fas fa-user-check text-dark"
-              ></i>
+  <main class="container-fluid mt-4">
+    <div class="row">
+      <!-- Panel izquierdo: listado de trabajos -->
+      <div class="col-md-4 bg-white border-end shadow-sm pe-0" style="min-height: 400px">
+        <div class="d-flex align-items-center justify-content-between mb-3 px-3">
+          <!-- Encabezado dinámico -->
+          <h5 class="fw-semibold text-dark m-0 d-flex align-items-center gap-2">
+            <!-- Ícono base -->
+            <i th:if="${!tienePerfil} or ${esPerfilPorDefecto}" class="fas fa-briefcase text-secondary"></i>
+            <i th:if="${tienePerfil} and ${esPerfilPorDefecto == false}" class="fas fa-user-check text-dark"></i>
 
-              <!-- Texto dinámico -->
-              <span
-                th:text="${tienePerfil} and ${esPerfilPorDefecto == false} ?
-        'Proyectos para ti' : 'Ofertas disponibles'"
-              >
-                Ofertas disponibles
-              </span>
-            </h5>
+            <!-- Texto dinámico -->
+            <span th:text="${tienePerfil} and ${esPerfilPorDefecto == false} ?
+        'Proyectos para ti' : 'Ofertas disponibles'">
+              Ofertas disponibles
+            </span>
+          </h5>
 
-            <!-- Badge "Para ti" cuando el perfil está completo -->
-            <div
-              th:if="${tienePerfil} and ${esPerfilPorDefecto == false}"
-              class="d-flex align-items-center ms-3"
-            >
-              <span
-                class="badge rounded-pill bg-light text-secondary border px-3 py-2 d-flex align-items-center gap-2"
-                style="letter-spacing: 0.2px"
-              >
-                <i class="fas fa-magic"></i>
-                <span>Recomendado</span>
-              </span>
-            </div>
+          <!-- Badge "Para ti" cuando el perfil está completo -->
+          <div th:if="${tienePerfil} and ${esPerfilPorDefecto == false}" class="d-flex align-items-center ms-3">
+            <span class="badge rounded-pill bg-light text-secondary border px-3 py-2 d-flex align-items-center gap-2"
+              style="letter-spacing: 0.2px">
+              <i class="fas fa-magic"></i>
+              <span>Recomendado</span>
+            </span>
           </div>
+        </div>
 
-          <div class="list-group list-group-flush" id="listaProyectos">
-            <div
-              role="button"
-              class="list-group-item list-group-item-action py-3 px-3"
-              th:each="proyecto, iterStat : ${proyectos}"
-              th:data-id="${proyecto.id}"
-              th:classappend="${iterStat.index == 0} ? ' active'"
-              th:onclick="|seleccionarProyecto(this, ${proyecto.id})|"
-            >
-              <div
-                class="d-flex w-100 justify-content-between align-items-start"
-              >
-                <h6 class="fw-semibold mb-0" th:text="${proyecto.titulo}">
-                  Título
-                </h6>
-                <small class="text-muted">
-                  <i class="fas fa-clock me-1"></i>
-                  <span
-                    class="fecha-relativa"
-                    th:data-fecha="${proyecto.fechaPublicacion}"
-                  ></span>
-                </small>
-              </div>
-              <small class="text-muted d-block mt-1">
-                <i class="fas fa-map-marker-alt me-1 text-danger"></i>
-                <span th:text="${proyecto.ubicacion}">Ubicación</span>
+        <div class="list-group list-group-flush" id="listaProyectos">
+          <div role="button" class="list-group-item list-group-item-action py-3 px-3"
+            th:each="proyecto, iterStat : ${proyectos}" th:data-id="${proyecto.id}"
+            th:classappend="${iterStat.index == 0} ? ' active'"
+            th:onclick="|seleccionarProyecto(this, ${proyecto.id})|">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+              <h6 class="fw-semibold mb-0" th:text="${proyecto.titulo}">
+                Título
+              </h6>
+              <small class="text-muted">
+                <i class="fas fa-clock me-1"></i>
+                <span class="fecha-relativa" th:data-fecha="${proyecto.fechaPublicacion}"></span>
               </small>
             </div>
+            <small class="text-muted d-block mt-1">
+              <i class="fas fa-map-marker-alt me-1 text-danger"></i>
+              <span th:text="${proyecto.ubicacion}">Ubicación</span>
+            </small>
           </div>
         </div>
+      </div>
 
-        <!-- Panel derecho: detalle del trabajo -->
-        <div id="panelDetalle" class="col-md-8 ps-0">
-          <div id="contenidoProyecto" class="w-100" data-proyecto-id="123">
-            <div
-              id="detalleProyecto"
-              class="bg-white border-start shadow-sm p-4 rounded-3"
-              style="max-height: 80vh; overflow-y: auto"
-            >
-              <div class="d-flex align-items-center mb-3">
-                <i class="fas fa-clipboard me-2 text-dark"></i>
-                <h5 id="tituloProyecto" class="fw-semibold text-body mb-0">
-                  <span id="tituloTexto"></span>
-                </h5>
-              </div>
+      <!-- Panel derecho: detalle del trabajo -->
+      <div id="panelDetalle" class="col-md-8 ps-0">
+        <div id="contenidoProyecto" class="w-100" data-proyecto-id="123">
+          <div id="detalleProyecto" class="bg-white border-start shadow-sm p-4 rounded-3"
+            style="max-height: 80vh; overflow-y: auto">
+            <div class="d-flex align-items-center mb-3">
+              <i class="fas fa-clipboard me-2 text-dark"></i>
+              <h5 id="tituloProyecto" class="fw-semibold text-body mb-0">
+                <span id="tituloTexto"></span>
+              </h5>
+            </div>
 
-              <!-- Descripción -->
-              <div class="mb-3">
-                <div class="row g-2">
-                  <div class="col-12 col-sm-3">
-                    <span
-                      class="text-uppercase small text-secondary fw-semibold"
-                      >Descripción</span
-                    >
-                  </div>
-                  <div class="col-12 col-sm-9">
-                    <pre
-                      id="descProyecto"
-                      class="mb-0 text-body"
-                      style="white-space: pre-wrap"
-                    ></pre>
-                  </div>
+            <!-- Descripción -->
+            <div class="mb-3">
+              <div class="row g-2">
+                <div class="col-12 col-sm-3">
+                  <span class="text-uppercase small text-secondary fw-semibold">Descripción</span>
+                </div>
+                <div class="col-12 col-sm-9">
+                  <pre id="descProyecto" class="mb-0 text-body" style="white-space: pre-wrap"></pre>
                 </div>
               </div>
-              <hr class="my-3" />
+            </div>
+            <hr class="my-3" />
 
-              <!-- Categoría -->
-              <div class="mb-2">
-                <div class="row g-2">
-                  <div class="col-12 col-sm-3">
-                    <span
-                      class="text-uppercase small text-secondary fw-semibold"
-                      >Categoría</span
-                    >
-                  </div>
-                  <div class="col-12 col-sm-9">
-                    <span id="catProyecto" class="text-body"></span>
-                  </div>
+            <!-- Categoría -->
+            <div class="mb-2">
+              <div class="row g-2">
+                <div class="col-12 col-sm-3">
+                  <span class="text-uppercase small text-secondary fw-semibold">Categoría</span>
+                </div>
+                <div class="col-12 col-sm-9">
+                  <span id="catProyecto" class="text-body"></span>
                 </div>
               </div>
+            </div>
 
-              <!-- Ubicación -->
-              <div class="mb-2">
-                <div class="row g-2">
-                  <div class="col-12 col-sm-3">
-                    <span
-                      class="text-uppercase small text-secondary fw-semibold"
-                      >Ubicación</span
-                    >
-                  </div>
-                  <div class="col-12 col-sm-9">
-                    <i class="fas fa-map-marker-alt me-1 text-secondary"></i>
-                    <span id="ubiProyecto" class="text-body"></span>
-                  </div>
+            <!-- Ubicación -->
+            <div class="mb-2">
+              <div class="row g-2">
+                <div class="col-12 col-sm-3">
+                  <span class="text-uppercase small text-secondary fw-semibold">Ubicación</span>
+                </div>
+                <div class="col-12 col-sm-9">
+                  <i class="fas fa-map-marker-alt me-1 text-secondary"></i>
+                  <span id="ubiProyecto" class="text-body"></span>
                 </div>
               </div>
+            </div>
 
-              <!-- Pago -->
-              <div class="mb-2">
-                <div class="row g-2">
-                  <div class="col-12 col-sm-3">
-                    <span
-                      class="text-uppercase small text-secondary fw-semibold"
-                      >Pago</span
-                    >
-                  </div>
-                  <div class="col-12 col-sm-9">
-                    <i class="fas fa-money-bill me-1 text-secondary"></i>
-                    <span id="pagoProyecto" class="text-body"></span>
-                  </div>
+            <!-- Pago -->
+            <div class="mb-2">
+              <div class="row g-2">
+                <div class="col-12 col-sm-3">
+                  <span class="text-uppercase small text-secondary fw-semibold">Pago</span>
+                </div>
+                <div class="col-12 col-sm-9">
+                  <i class="fas fa-money-bill me-1 text-secondary"></i>
+                  <span id="pagoProyecto" class="text-body"></span>
                 </div>
               </div>
+            </div>
 
-              <!-- Inicio -->
-              <div class="mb-2">
-                <div class="row g-2">
-                  <div class="col-12 col-sm-3">
-                    <span
-                      class="text-uppercase small text-secondary fw-semibold"
-                      >Inicio</span
-                    >
-                  </div>
-                  <div class="col-12 col-sm-9">
-                    <i class="fas fa-calendar-plus me-1 text-secondary"></i>
-                    <span id="inicioProyecto" class="text-body"></span>
-                  </div>
+            <!-- Inicio -->
+            <div class="mb-2">
+              <div class="row g-2">
+                <div class="col-12 col-sm-3">
+                  <span class="text-uppercase small text-secondary fw-semibold">Inicio</span>
+                </div>
+                <div class="col-12 col-sm-9">
+                  <i class="fas fa-calendar-plus me-1 text-secondary"></i>
+                  <span id="inicioProyecto" class="text-body"></span>
                 </div>
               </div>
+            </div>
 
-              <!-- Final -->
-              <div class="mb-3">
-                <div class="row g-2">
-                  <div class="col-12 col-sm-3">
-                    <span
-                      class="text-uppercase small text-secondary fw-semibold"
-                      >Final</span
-                    >
-                  </div>
-                  <div class="col-12 col-sm-9">
-                    <i class="fas fa-calendar-check me-1 text-secondary"></i>
-                    <span id="finProyecto" class="text-body"></span>
-                  </div>
+            <!-- Final -->
+            <div class="mb-3">
+              <div class="row g-2">
+                <div class="col-12 col-sm-3">
+                  <span class="text-uppercase small text-secondary fw-semibold">Final</span>
+                </div>
+                <div class="col-12 col-sm-9">
+                  <i class="fas fa-calendar-check me-1 text-secondary"></i>
+                  <span id="finProyecto" class="text-body"></span>
                 </div>
               </div>
-              <hr class="my-3" />
+            </div>
+            <hr class="my-3" />
 
-              <!-- Modalidad -->
-              <div class="mb-4">
-                <div class="row g-2">
-                  <div class="col-12 col-sm-3">
-                    <span
-                      class="text-uppercase small text-secondary fw-semibold"
-                      >Modalidad</span
-                    >
-                  </div>
-                  <div class="col-12 col-sm-9">
-                    <i class="fas fa-laptop-house me-1 text-secondary"></i>
-                    <span id="modProyecto" class="text-body"></span>
-                  </div>
+            <!-- Modalidad -->
+            <div class="mb-4">
+              <div class="row g-2">
+                <div class="col-12 col-sm-3">
+                  <span class="text-uppercase small text-secondary fw-semibold">Modalidad</span>
+                </div>
+                <div class="col-12 col-sm-9">
+                  <i class="fas fa-laptop-house me-1 text-secondary"></i>
+                  <span id="modProyecto" class="text-body"></span>
                 </div>
               </div>
+            </div>
 
-              <!-- Acciones -->
-              <div class="d-flex gap-2 flex-wrap">
-                <form id="formPostulacion" method="post" class="d-inline">
-                  <input
-                    type="hidden"
-                    id="montoContraofertaInput"
-                    name="montoContraoferta"
-                  />
-                  <button type="submit" class="btn btn-dark">
-                    <i class="fas fa-paper-plane me-1"></i> Postular
-                  </button>
-                </form>
-                <button class="btn btn-outline-secondary" id="btnContraoferta">
-                  <i class="fas fa-hand-holding-usd me-1"></i> Enviar
-                  contraoferta
+            <!-- Acciones -->
+            <div class="d-flex gap-2 flex-wrap">
+              <form id="formPostulacion" method="post" class="d-inline">
+                <input type="hidden" id="montoContraofertaInput" name="montoContraoferta" />
+                <button type="submit" class="btn btn-dark">
+                  <i class="fas fa-paper-plane me-1"></i> Postular
                 </button>
-              </div>
-
-              <div id="contenedorInfoContraoferta" class="mt-3"></div>
+              </form>
+              <button class="btn btn-outline-secondary" id="btnContraoferta">
+                <i class="fas fa-hand-holding-usd me-1"></i> Enviar
+                contraoferta
+              </button>
             </div>
-          </div>
-        </div>
-      </div>
-      <!-- Template para mostrar si ya se postuló -->
-      <template id="templatePostulado">
-        <div class="shadow-sm bg-white rounded-4 p-5 text-center">
-          <div class="mb-4">
-            <i class="fas fa-user-check fa-4x text-success mb-3"></i>
-            <h4 class="fw-bold text-success">
-              ¡Ya estás postulado a esta oferta!
-            </h4>
-          </div>
-          <p class="text-muted mb-4">
-            Tu postulación ha sido registrada con éxito. El empleador podrá
-            revisar tu perfil y contactarte si avanzas en el proceso.
-          </p>
 
-          <div class="bg-light p-3 rounded-3 mb-2">
-            <p class="mb-2 text-secondary fw-semibold">Consejos útiles:</p>
-            <ul
-              class="list-unstyled text-start text-muted small d-inline-block"
-              style="max-width: 400px; margin: 0 auto"
-            >
-              <li>
-                <i class="fas fa-lightbulb me-2 text-warning"></i> Verifica que
-                tu perfil esté completo y actualizado.
-              </li>
-              <li>
-                <i class="fas fa-star me-2 text-primary"></i> Agrega ejemplos o
-                proyectos a tu portafolio.
-              </li>
-              <li>
-                <i class="fas fa-handshake me-2 text-success"></i> Sé proactivo
-                revisando nuevas ofertas similares.
-              </li>
-            </ul>
-          </div>
-
-          <p class="text-muted small mt-4">
-            Sigue navegando en la plataforma y encuentra más oportunidades que
-            se ajusten a ti.
-          </p>
-        </div>
-      </template>
-    </main>
-
-    <section class="py-5 bg-light">
-      <div class="container">
-        <h2 class="fw-bold" style="color: #343a40">
-          ¿Todo listo para comenzar?
-        </h2>
-        <p class="fw-semibold">Categorías destacadas</p>
-        <div class="row row-cols-1 row-cols-md-4 g-3 mt-3">
-          <!-- 1 -->
-          <div class="col">
-            <div class="card h-100 text-center p-3 border rounded shadow-sm">
-              <div class="fs-2 text-primary">🍳</div>
-              <h6 class="mt-2">Cocina y Gastronomía</h6>
-            </div>
-          </div>
-
-          <!-- 2 -->
-          <div class="col">
-            <div class="card h-100 text-center p-3 border rounded shadow-sm">
-              <div class="fs-2 text-primary">🎭</div>
-              <h6 class="mt-2">Creativos y Arte</h6>
-            </div>
-          </div>
-
-          <!-- 3 -->
-          <div class="col">
-            <div class="card h-100 text-center p-3 border rounded shadow-sm">
-              <div class="fs-2 text-primary">💻</div>
-              <h6 class="mt-2">Tecnología y Desarrollo</h6>
-            </div>
-          </div>
-
-          <!-- 4 -->
-          <div class="col">
-            <div class="card h-100 text-center p-3 border rounded shadow-sm">
-              <div class="fs-2 text-primary">✍️</div>
-              <h6 class="mt-2">Redacción y Traducción</h6>
-            </div>
-          </div>
-
-          <!-- 5 -->
-          <div class="col">
-            <div class="card h-100 text-center p-3 border rounded shadow-sm">
-              <div class="fs-2 text-primary">🧳</div>
-              <h6 class="mt-2">Para Turistas</h6>
-            </div>
-          </div>
-
-          <!-- 6 -->
-          <div class="col">
-            <div class="card h-100 text-center p-3 border rounded shadow-sm">
-              <div class="fs-2 text-primary">📚</div>
-              <h6 class="mt-2">Educación y Tutorías</h6>
-            </div>
-          </div>
-
-          <!-- 7 -->
-          <div class="col">
-            <div class="card h-100 text-center p-3 border rounded shadow-sm">
-              <div class="fs-2 text-primary">🧹</div>
-              <h6 class="mt-2">Servicios Generales</h6>
-            </div>
-          </div>
-
-          <!-- 8 -->
-          <div class="col">
-            <div class="card h-100 text-center p-3 border rounded shadow-sm">
-              <div class="fs-2 text-primary">📦</div>
-              <h6 class="mt-2">Logística y Operaciones</h6>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="py-5 bg-white">
-      <div class="container">
-        <div class="row align-items-center">
-          <div class="col-md-6">
-            <h2 class="fw-bold mb-3" style="color: #343a40">
-              Recibe tu dinero y retira los fondos desde Workeando
-            </h2>
-
-            <p class="mb-3">
-              Elige tu método de pago, la moneda en la que quieres cobrar, y la
-              frecuencia de retiro de tus fondos.
-            </p>
-            <div class="d-flex gap-3 flex-wrap">
-              <img th:src="@{/img/pay.jpg}" height="80" alt="Paypal" />
-              <img th:src="@{/img/pre.jpg}" height="80" alt="Parepaga" />
-              <img
-                th:src="@{/img/mercado.jpg}"
-                height="80"
-                alt="Mercado Pago"
-              />
-              <img
-                th:src="@{/img/trans.jpg}"
-                height="80"
-                alt="Transferencia bancaria"
-              />
-            </div>
-          </div>
-          <div class="col-md-6 text-center">
-            <img
-              th:src="@{/img/joven.jpg}"
-              class="img-fluid rounded-circle"
-              alt="Usuario feliz con su pago"
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- Modal de contraoferta -->
-    <div
-      class="modal fade"
-      id="modalContraoferta"
-      tabindex="-1"
-      aria-labelledby="modalContraofertaLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalContraofertaLabel">
-              Enviar contraoferta
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Cerrar"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <label for="montoNuevo" class="form-label"
-              >Propuesta económica (S/)</label
-            >
-            <input
-              type="number"
-              class="form-control"
-              id="montoNuevo"
-              min="0"
-              step="0.01"
-              placeholder="Ingresa tu contraoferta"
-            />
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              id="btnConfirmarContraoferta"
-            >
-              Confirmar contraoferta
-            </button>
+            <div id="contenedorInfoContraoferta" class="mt-3"></div>
           </div>
         </div>
       </div>
     </div>
-    <!-- éxito de postulación -->
-    <div
-      class="modal fade"
-      id="modalPostulacionExitosa"
-      tabindex="-1"
-      aria-labelledby="modalPostulacionExitosaLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content text-center">
-          <div class="modal-header border-0">
-            <h5 class="modal-title w-100" id="modalPostulacionExitosaLabel">
-              ¡Postulación exitosa!
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Cerrar"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <p>Te has postulado correctamente al proyecto.</p>
-            <button type="button" class="btn btn-primary mt-3" id="btnIrAFree">
-              Seguir explorando ofertas laborales
-            </button>
-          </div>
+    <!-- Template para mostrar si ya se postuló -->
+    <template id="templatePostulado">
+      <div class="shadow-sm bg-white rounded-4 p-5 text-center">
+        <div class="mb-4">
+          <i class="fas fa-user-check fa-4x text-success mb-3"></i>
+          <h4 class="fw-bold text-success">
+            ¡Ya estás postulado a esta oferta!
+          </h4>
         </div>
-      </div>
-    </div>
-    <!-- Modal de advertencia: ya está postulado -->
-    <div
-      class="modal fade"
-      id="modalYaPostulado"
-      tabindex="-1"
-      aria-labelledby="modalYaPostuladoLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content text-center">
-          <div class="modal-header border-0">
-            <h5
-              class="modal-title w-100 text-danger"
-              id="modalYaPostuladoLabel"
-            >
-              Ya estás postulado
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Cerrar"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <p>Ya enviaste una postulación para este proyecto.</p>
-            <button
-              type="button"
-              class="btn btn-outline-primary mt-3"
-              id="btnExplorarOfertas"
-            >
-              Explorar otras ofertas laborales
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Contenedor de toasts  -->
-    <div
-      id="toastContainer"
-      class="position-fixed bottom-0 end-0 p-3"
-      style="z-index: 1100"
-    ></div>
-
-    <!-- PERFIL FREELANCER -->
-    <section
-      class="py-5 bg-light text-center"
-      th:if="${!tienePerfil || esPerfilPorDefecto}"
-    >
-      <div class="container">
-        <h2 class="fw-bold text-dark">Edita tu perfil y empieza a trabajar</h2>
-        <p class="fw-semibold text-muted">
-          Construye tu perfil para destacar tus habilidades y conseguir
-          proyectos interesantes.
+        <p class="text-muted mb-4">
+          Tu postulación ha sido registrada con éxito. El empleador podrá
+          revisar tu perfil y contactarte si avanzas en el proceso.
         </p>
 
-        <!-- Botón único de acción -->
-        <form th:action="@{/free/perfil}" method="get" style="display: inline">
-          <button type="submit" class="btn btn-dark btn-lg px-4 mt-3">
-            <span
-              th:text="${esPerfilPorDefecto ? 'Completar perfil' : 'Crear perfil'}"
-            ></span>
+        <div class="bg-light p-3 rounded-3 mb-2">
+          <p class="mb-2 text-secondary fw-semibold">Consejos útiles:</p>
+          <ul class="list-unstyled text-start text-muted small d-inline-block" style="max-width: 400px; margin: 0 auto">
+            <li>
+              <i class="fas fa-lightbulb me-2 text-warning"></i> Verifica que
+              tu perfil esté completo y actualizado.
+            </li>
+            <li>
+              <i class="fas fa-star me-2 text-primary"></i> Agrega ejemplos o
+              proyectos a tu portafolio.
+            </li>
+            <li>
+              <i class="fas fa-handshake me-2 text-success"></i> Sé proactivo
+              revisando nuevas ofertas similares.
+            </li>
+          </ul>
+        </div>
+
+        <p class="text-muted small mt-4">
+          Sigue navegando en la plataforma y encuentra más oportunidades que
+          se ajusten a ti.
+        </p>
+      </div>
+    </template>
+  </main>
+
+  <section class="py-5 bg-light">
+    <div class="container">
+      <h2 class="fw-bold" style="color: #343a40">
+        ¿Todo listo para comenzar?
+      </h2>
+      <p class="fw-semibold">Categorías destacadas</p>
+      <div class="row row-cols-1 row-cols-md-4 g-3 mt-3">
+        <!-- 1 -->
+        <div class="col">
+          <div class="card h-100 text-center p-3 border rounded shadow-sm">
+            <div class="fs-2 text-primary">🍳</div>
+            <h6 class="mt-2">Cocina y Gastronomía</h6>
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="col">
+          <div class="card h-100 text-center p-3 border rounded shadow-sm">
+            <div class="fs-2 text-primary">🎭</div>
+            <h6 class="mt-2">Creativos y Arte</h6>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="col">
+          <div class="card h-100 text-center p-3 border rounded shadow-sm">
+            <div class="fs-2 text-primary">💻</div>
+            <h6 class="mt-2">Tecnología y Desarrollo</h6>
+          </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="col">
+          <div class="card h-100 text-center p-3 border rounded shadow-sm">
+            <div class="fs-2 text-primary">✍️</div>
+            <h6 class="mt-2">Redacción y Traducción</h6>
+          </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="col">
+          <div class="card h-100 text-center p-3 border rounded shadow-sm">
+            <div class="fs-2 text-primary">🧳</div>
+            <h6 class="mt-2">Para Turistas</h6>
+          </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="col">
+          <div class="card h-100 text-center p-3 border rounded shadow-sm">
+            <div class="fs-2 text-primary">📚</div>
+            <h6 class="mt-2">Educación y Tutorías</h6>
+          </div>
+        </div>
+
+        <!-- 7 -->
+        <div class="col">
+          <div class="card h-100 text-center p-3 border rounded shadow-sm">
+            <div class="fs-2 text-primary">🧹</div>
+            <h6 class="mt-2">Servicios Generales</h6>
+          </div>
+        </div>
+
+        <!-- 8 -->
+        <div class="col">
+          <div class="card h-100 text-center p-3 border rounded shadow-sm">
+            <div class="fs-2 text-primary">📦</div>
+            <h6 class="mt-2">Logística y Operaciones</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-5 bg-white">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h2 class="fw-bold mb-3" style="color: #343a40">
+            Recibe tu dinero y retira los fondos desde Workeando
+          </h2>
+
+          <p class="mb-3">
+            Elige tu método de pago, la moneda en la que quieres cobrar, y la
+            frecuencia de retiro de tus fondos.
+          </p>
+          <div class="d-flex gap-3 flex-wrap">
+            <img th:src="@{/img/pay.jpg}" height="80" alt="Paypal" />
+            <img th:src="@{/img/pre.jpg}" height="80" alt="Parepaga" />
+            <img th:src="@{/img/mercado.jpg}" height="80" alt="Mercado Pago" />
+            <img th:src="@{/img/trans.jpg}" height="80" alt="Transferencia bancaria" />
+          </div>
+        </div>
+        <div class="col-md-6 text-center">
+          <img th:src="@{/img/joven.jpg}" class="img-fluid rounded-circle" alt="Usuario feliz con su pago" />
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Modal de contraoferta -->
+  <div class="modal fade" id="modalContraoferta" tabindex="-1" aria-labelledby="modalContraofertaLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalContraofertaLabel">
+            Enviar contraoferta
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <label for="montoNuevo" class="form-label">Propuesta económica (S/)</label>
+          <input type="number" class="form-control" id="montoNuevo" min="0" step="0.01"
+            placeholder="Ingresa tu contraoferta" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cancelar
           </button>
-        </form>
-      </div>
-    </section>
-
-    <!-- Toast de Éxito -->
-    <div
-      aria-live="polite"
-      aria-atomic="true"
-      class="position-fixed bottom-0 end-0 p-3"
-      style="z-index: 9999"
-    >
-      <div
-        class="toast align-items-center text-white bg-success border-0"
-        role="alert"
-        th:if="${toastExito}"
-        id="toastExito"
-        th:classappend="${toastExito} ? 'show' : ''"
-        data-bs-delay="4000"
-      >
-        <div class="d-flex">
-          <div class="toast-body" th:text="${toastExito}"></div>
-          <button
-            type="button"
-            class="btn-close btn-close-white me-2 m-auto"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn btn-primary" id="btnConfirmarContraoferta">
+            Confirmar contraoferta
+          </button>
         </div>
       </div>
     </div>
-
-    <!-- FOOTER -->
-    <footer class="bg-dark text-light pt-5 pb-4">
-      <div class="container">
-        <div class="row gy-4">
-          <!-- Logo / Marca -->
-          <div class="col-md-4 text-center text-md-start">
-            <h5 class="fw-bold">Workeando</h5>
-            <p class="small">
-              Conectamos talento con oportunidades. Encuentra proyectos, postula
-              y haz crecer tu carrera freelance.
-            </p>
-          </div>
-
-          <!-- Enlaces rápidos -->
-          <div class="col-md-4 text-center">
-            <h6 class="fw-semibold mb-3">Enlaces</h6>
-            <ul class="list-unstyled small">
-              <li>
-                <a href="#" class="text-light text-decoration-none"
-                  >Proyectos</a
-                >
-              </li>
-              <li>
-                <a href="#" class="text-light text-decoration-none"
-                  >Cómo funciona</a
-                >
-              </li>
-              <li>
-                <a href="#" class="text-light text-decoration-none">Soporte</a>
-              </li>
-              <li>
-                <a href="#" class="text-light text-decoration-none"
-                  >Política de privacidad</a
-                >
-              </li>
-            </ul>
-          </div>
-
-          <!-- Contacto -->
-          <div class="col-md-4 text-center text-md-end">
-            <h6 class="fw-semibold mb-3">Contáctanos</h6>
-            <p class="small mb-1">
-              <i class="fas fa-envelope me-2"></i> soporte@workeando.com
-            </p>
-            <p class="small mb-1">
-              <i class="fas fa-phone me-2"></i> +51 987 654 321
-            </p>
-            <div class="mt-2">
-              <a href="#" class="text-light me-3"
-                ><i class="fab fa-facebook-f"></i
-              ></a>
-              <a href="#" class="text-light me-3"
-                ><i class="fab fa-linkedin-in"></i
-              ></a>
-              <a href="#" class="text-light"><i class="fab fa-twitter"></i></a>
-            </div>
-          </div>
+  </div>
+  <!-- éxito de postulación -->
+  <div class="modal fade" id="modalPostulacionExitosa" tabindex="-1" aria-labelledby="modalPostulacionExitosaLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-header border-0">
+          <h5 class="modal-title w-100" id="modalPostulacionExitosaLabel">
+            ¡Postulación exitosa!
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-
-        <hr class="border-light my-4" />
-
-        <!-- Derechos -->
-        <div class="row">
-          <div class="col text-center small">
-            <p class="mb-0">
-              &copy; 2025 <strong>Workeando</strong> | Todos los derechos
-              reservados
-            </p>
-          </div>
+        <div class="modal-body">
+          <p>Te has postulado correctamente al proyecto.</p>
+          <button type="button" class="btn btn-primary mt-3" id="btnIrAFree">
+            Seguir explorando ofertas laborales
+          </button>
         </div>
-      </div>
-    </footer>
-
-    <!-- JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:src="@{/js/free.js}"></script>
-
-    <!-- OFFCANVAS: PERFIL DEL FREELANCER -->
-    <div
-      class="offcanvas offcanvas-end"
-      tabindex="-1"
-      id="perfilOffcanvas"
-      aria-labelledby="perfilOffcanvasLabel"
-    >
-      <div class="offcanvas-header border-bottom">
-        <h5
-          class="offcanvas-title text-dark fw-semibold"
-          id="perfilOffcanvasLabel"
-        >
-          <i class="fas fa-user-circle me-2 text-secondary"></i> Mi Perfil
-        </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="offcanvas"
-          aria-label="Cerrar"
-        ></button>
-      </div>
-
-      <div class="offcanvas-body text-dark small" th:if="${freelancer != null}">
-        <!-- Información General -->
-        <section class="mb-4">
-          <h6
-            class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2"
-          >
-            Información general
-          </h6>
-          <dl class="row mb-0">
-            <dt class="col-4">
-              <i class="fas fa-phone-alt text-secondary me-2"></i>Teléfono
-            </dt>
-            <dd class="col-8" th:text="${freelancer.telefono}">-</dd>
-
-            <dt class="col-4">
-              <i class="fas fa-graduation-cap text-secondary me-2"></i>Estudios
-            </dt>
-            <dd class="col-8" th:text="${freelancer.nivelEstudios}">-</dd>
-
-            <dt class="col-4" th:if="${freelancer.linkedin}">
-              <i class="fab fa-linkedin text-secondary me-2"></i>LinkedIn
-            </dt>
-            <dd class="col-8" th:if="${freelancer.linkedin}">
-              <a
-                th:href="${freelancer.linkedin}"
-                target="_blank"
-                th:text="${freelancer.linkedin}"
-                class="text-decoration-none"
-                >Enlace</a
-              >
-            </dd>
-
-            <dt class="col-4" th:if="${freelancer.portafolio}">
-              <i class="fas fa-briefcase text-secondary me-2"></i>Portafolio
-            </dt>
-            <dd class="col-8" th:if="${freelancer.portafolio}">
-              <a
-                th:href="${freelancer.portafolio}"
-                target="_blank"
-                th:text="${freelancer.portafolio}"
-                class="text-decoration-none"
-                >Enlace</a
-              >
-            </dd>
-          </dl>
-        </section>
-
-        <!-- Categorías -->
-        <section
-          class="mb-4"
-          th:if="${freelancer.categorias != null and !freelancer.categorias.isEmpty()}"
-        >
-          <h6
-            class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2"
-          >
-            <i class="fas fa-tags text-secondary me-2"></i>Categorías
-          </h6>
-          <ul class="list-unstyled mb-0">
-            <li
-              th:each="cat : ${freelancer.categorias}"
-              th:text="${cat.nombre}"
-            ></li>
-          </ul>
-        </section>
-
-        <!-- Idiomas -->
-        <section
-          class="mb-4"
-          th:if="${freelancer.idiomas != null and !freelancer.idiomas.isEmpty()}"
-        >
-          <h6
-            class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2"
-          >
-            <i class="fas fa-language text-secondary me-2"></i>Idiomas
-          </h6>
-          <ul class="list-unstyled mb-0">
-            <li
-              th:each="idioma : ${freelancer.idiomas}"
-              th:text="${idioma.nombre + ' - ' + idioma.nivel}"
-            ></li>
-          </ul>
-        </section>
-
-        <!-- Habilidades técnicas -->
-        <section
-          class="mb-4"
-          th:if="${freelancer.habilidadesTecnicas != null and !freelancer.habilidadesTecnicas.isEmpty()}"
-        >
-          <h6
-            class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2"
-          >
-            <i class="fas fa-tools text-secondary me-2"></i>Habilidades técnicas
-          </h6>
-          <ul class="list-unstyled mb-0">
-            <li
-              th:each="hab : ${freelancer.habilidadesTecnicas}"
-              th:text="${hab.nombre + ' - ' + hab.nivel}"
-            ></li>
-          </ul>
-        </section>
-
-        <!-- Experiencia Laboral -->
-        <section
-          th:if="${freelancer.experienciaLaboral != null and !freelancer.experienciaLaboral.isEmpty()}"
-        >
-          <h6
-            class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2"
-          >
-            <i class="fas fa-briefcase text-secondary me-2"></i>Experiencia
-            laboral
-          </h6>
-          <div
-            th:each="exp : ${freelancer.experienciaLaboral}"
-            class="mb-3 pb-2 border-bottom"
-          >
-            <p class="mb-1 fw-semibold" th:text="${exp.puesto}">Puesto</p>
-            <p class="mb-1 text-muted small" th:text="${exp.empresa}">
-              Empresa
-            </p>
-            <p
-              class="mb-1 small"
-              th:text="${exp.fechaDesde + ' - ' + exp.fechaHasta}"
-            >
-              Fechas
-            </p>
-            <p class="mb-0 text-secondary small" th:text="${exp.descripcion}">
-              Descripción
-            </p>
-          </div>
-        </section>
-
-        <!-- Botón editar perfil -->
-        <div class="mt-4">
-          <a
-            href="/free/perfil?modoEdicion=true"
-            class="btn btn-outline-dark w-100 btn-sm"
-          >
-            <i class="fas fa-edit me-2"></i>Editar perfil
-          </a>
-        </div>
-      </div>
-
-      <!-- Si no hay perfil -->
-      <div
-        class="offcanvas-body text-muted small text-center"
-        th:if="${freelancer == null}"
-      >
-        <p>No se encontró información del perfil.</p>
       </div>
     </div>
-  </body>
+  </div>
+  <!-- Modal de advertencia: ya está postulado -->
+  <div class="modal fade" id="modalYaPostulado" tabindex="-1" aria-labelledby="modalYaPostuladoLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-header border-0">
+          <h5 class="modal-title w-100 text-danger" id="modalYaPostuladoLabel">
+            Ya estás postulado
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p>Ya enviaste una postulación para este proyecto.</p>
+          <button type="button" class="btn btn-outline-primary mt-3" id="btnExplorarOfertas">
+            Explorar otras ofertas laborales
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor de toasts  -->
+  <div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100"></div>
+
+  <!-- PERFIL FREELANCER -->
+  <section class="py-5 bg-light text-center" th:if="${!tienePerfil || esPerfilPorDefecto}">
+    <div class="container">
+      <h2 class="fw-bold text-dark">Edita tu perfil y empieza a trabajar</h2>
+      <p class="fw-semibold text-muted">
+        Construye tu perfil para destacar tus habilidades y conseguir
+        proyectos interesantes.
+      </p>
+
+      <!-- Botón único de acción -->
+      <form th:action="@{/free/perfil}" method="get" style="display: inline">
+        <button type="submit" class="btn btn-dark btn-lg px-4 mt-3">
+          <span th:text="${esPerfilPorDefecto ? 'Completar perfil' : 'Crear perfil'}"></span>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Toast de Éxito -->
+  <div aria-live="polite" aria-atomic="true" class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" th:if="${toastExito}"
+      id="toastExito" th:classappend="${toastExito} ? 'show' : ''" data-bs-delay="4000">
+      <div class="d-flex">
+        <div class="toast-body" th:text="${toastExito}"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-dark text-light pt-5 pb-4">
+    <div class="container">
+      <div class="row gy-4">
+        <!-- Logo / Marca -->
+        <div class="col-md-4 text-center text-md-start">
+          <h5 class="fw-bold">Workeando</h5>
+          <p class="small">
+            Conectamos talento con oportunidades. Encuentra proyectos, postula
+            y haz crecer tu carrera freelance.
+          </p>
+        </div>
+
+        <!-- Enlaces rápidos -->
+        <div class="col-md-4 text-center">
+          <h6 class="fw-semibold mb-3">Enlaces</h6>
+          <ul class="list-unstyled small">
+            <li>
+              <a href="#" class="text-light text-decoration-none">Proyectos</a>
+            </li>
+            <li>
+              <a href="#" class="text-light text-decoration-none">Cómo funciona</a>
+            </li>
+            <li>
+              <a href="#" class="text-light text-decoration-none">Soporte</a>
+            </li>
+            <li>
+              <a href="#" class="text-light text-decoration-none">Política de privacidad</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Contacto -->
+        <div class="col-md-4 text-center text-md-end">
+          <h6 class="fw-semibold mb-3">Contáctanos</h6>
+          <p class="small mb-1">
+            <i class="fas fa-envelope me-2"></i> soporte@workeando.com
+          </p>
+          <p class="small mb-1">
+            <i class="fas fa-phone me-2"></i> +51 987 654 321
+          </p>
+          <div class="mt-2">
+            <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="text-light me-3"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="text-light"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <hr class="border-light my-4" />
+
+      <!-- Derechos -->
+      <div class="row">
+        <div class="col text-center small">
+          <p class="mb-0">
+            &copy; 2025 <strong>Workeando</strong> | Todos los derechos
+            reservados
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script th:src="@{/js/free.js}"></script>
+
+  <!-- OFFCANVAS: PERFIL DEL FREELANCER -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="perfilOffcanvas" aria-labelledby="perfilOffcanvasLabel">
+    <div class="offcanvas-header border-bottom">
+      <h5 class="offcanvas-title text-dark fw-semibold" id="perfilOffcanvasLabel">
+        <i class="fas fa-user-circle me-2 text-secondary"></i> Mi Perfil
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+
+    <div class="offcanvas-body text-dark small" th:if="${freelancer != null}">
+      <!-- ⭐ REPUTACIÓN DEL FREELANCER -->
+      <section class="mb-4">
+        <h6 class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2">
+          <i class="fas fa-star text-warning me-1"></i> Reputación
+        </h6>
+
+        <div th:if="${ratingTotal > 0}">
+          <span class="fw-semibold" th:text="${#numbers.formatDecimal(ratingPromedio,1,1)}">0.0</span>
+          /5 <i class="fas fa-star text-warning"></i>
+          <div class="text-muted small">
+            <span th:text="${ratingTotal}">0</span> opiniones
+          </div>
+        </div>
+
+        <div th:if="${ratingTotal == 0}" class="text-muted">
+          Aún no tienes calificaciones.
+        </div>
+      </section>
+
+      <!-- Información General -->
+      <section class="mb-4">
+        <h6 class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2">
+          Información general
+        </h6>
+        <dl class="row mb-0">
+          <dt class="col-4">
+            <i class="fas fa-phone-alt text-secondary me-2"></i>Teléfono
+          </dt>
+          <dd class="col-8" th:text="${freelancer.telefono}">-</dd>
+
+          <dt class="col-4">
+            <i class="fas fa-graduation-cap text-secondary me-2"></i>Estudios
+          </dt>
+          <dd class="col-8" th:text="${freelancer.nivelEstudios}">-</dd>
+
+          <dt class="col-4" th:if="${freelancer.linkedin}">
+            <i class="fab fa-linkedin text-secondary me-2"></i>LinkedIn
+          </dt>
+          <dd class="col-8" th:if="${freelancer.linkedin}">
+            <a th:href="${freelancer.linkedin}" target="_blank" th:text="${freelancer.linkedin}"
+              class="text-decoration-none">Enlace</a>
+          </dd>
+
+          <dt class="col-4" th:if="${freelancer.portafolio}">
+            <i class="fas fa-briefcase text-secondary me-2"></i>Portafolio
+          </dt>
+          <dd class="col-8" th:if="${freelancer.portafolio}">
+            <a th:href="${freelancer.portafolio}" target="_blank" th:text="${freelancer.portafolio}"
+              class="text-decoration-none">Enlace</a>
+          </dd>
+        </dl>
+      </section>
+
+      <!-- Categorías -->
+      <section class="mb-4" th:if="${freelancer.categorias != null and !freelancer.categorias.isEmpty()}">
+        <h6 class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2">
+          <i class="fas fa-tags text-secondary me-2"></i>Categorías
+        </h6>
+        <ul class="list-unstyled mb-0">
+          <li th:each="cat : ${freelancer.categorias}" th:text="${cat.nombre}"></li>
+        </ul>
+      </section>
+
+      <!-- Idiomas -->
+      <section class="mb-4" th:if="${freelancer.idiomas != null and !freelancer.idiomas.isEmpty()}">
+        <h6 class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2">
+          <i class="fas fa-language text-secondary me-2"></i>Idiomas
+        </h6>
+        <ul class="list-unstyled mb-0">
+          <li th:each="idioma : ${freelancer.idiomas}" th:text="${idioma.nombre + ' - ' + idioma.nivel}"></li>
+        </ul>
+      </section>
+
+      <!-- Habilidades técnicas -->
+      <section class="mb-4"
+        th:if="${freelancer.habilidadesTecnicas != null and !freelancer.habilidadesTecnicas.isEmpty()}">
+        <h6 class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2">
+          <i class="fas fa-tools text-secondary me-2"></i>Habilidades técnicas
+        </h6>
+        <ul class="list-unstyled mb-0">
+          <li th:each="hab : ${freelancer.habilidadesTecnicas}" th:text="${hab.nombre + ' - ' + hab.nivel}"></li>
+        </ul>
+      </section>
+
+      <!-- Experiencia Laboral -->
+      <section th:if="${freelancer.experienciaLaboral != null and !freelancer.experienciaLaboral.isEmpty()}">
+        <h6 class="text-muted text-uppercase fw-semibold small border-bottom pb-1 mb-2">
+          <i class="fas fa-briefcase text-secondary me-2"></i>Experiencia
+          laboral
+        </h6>
+        <div th:each="exp : ${freelancer.experienciaLaboral}" class="mb-3 pb-2 border-bottom">
+          <p class="mb-1 fw-semibold" th:text="${exp.puesto}">Puesto</p>
+          <p class="mb-1 text-muted small" th:text="${exp.empresa}">
+            Empresa
+          </p>
+          <p class="mb-1 small" th:text="${exp.fechaDesde + ' - ' + exp.fechaHasta}">
+            Fechas
+          </p>
+          <p class="mb-0 text-secondary small" th:text="${exp.descripcion}">
+            Descripción
+          </p>
+        </div>
+      </section>
+
+      <!-- Botón editar perfil -->
+      <div class="mt-4">
+        <a href="/free/perfil?modoEdicion=true" class="btn btn-outline-dark w-100 btn-sm">
+          <i class="fas fa-edit me-2"></i>Editar perfil
+        </a>
+      </div>
+    </div>
+
+    <!-- Si no hay perfil -->
+    <div class="offcanvas-body text-muted small text-center" th:if="${freelancer == null}">
+      <p>No se encontró información del perfil.</p>
+    </div>
+  </div>
+</body>
+
 </html>

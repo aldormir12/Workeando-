@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Contrato Workeando</title>
+
+    <style>
+        /* Layout general */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #333;
+            margin: 32px 40px;
+        }
+
+        /* Encabezado corporativo */
+        .header {
+            background-color: #0d6efd;
+            color: #ffffff;
+            padding: 10px 18px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .header-title {
+            font-size: 18pt;
+            font-weight: bold;
+        }
+
+        .header-sub {
+            font-size: 10pt;
+        }
+
+        /* Título principal */
+        h1 {
+            font-size: 15pt;
+            text-align: center;
+            margin: 10px 0 16px 0;
+            text-transform: uppercase;
+        }
+
+        /* Bloque inicial de datos */
+        .meta {
+            font-size: 10pt;
+            margin-bottom: 14px;
+        }
+
+        .meta-row {
+            margin-bottom: 2px;
+        }
+
+        .meta-label {
+            display: inline-block;
+            width: 110px;
+            font-weight: bold;
+        }
+
+        /* Secciones y subtítulos */
+        .section-title {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-top: 18px;
+            margin-bottom: 6px;
+        }
+
+        .section-text {
+            font-size: 11pt;
+            text-align: justify;
+        }
+
+        /* Listas de obligaciones */
+        .bullet-list {
+            margin: 0 0 0 16px;
+            padding: 0;
+            list-style-type: disc;
+        }
+
+        .bullet-list li {
+            margin-bottom: 3px;
+        }
+
+        /* Firmas */
+        .firmas {
+            margin-top: 38px;
+        }
+
+        .firma-block {
+            width: 45%;
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .firma-nombre {
+            margin-top: 32px;
+            border-top: 1px solid #000;
+            padding-top: 4px;
+            font-weight: bold;
+            font-size: 11pt;
+        }
+
+        .firma-digital {
+            font-size: 9pt;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ENCABEZADO WORKEANDO -->
+<div class="header">
+    <div class="header-title">Workeando</div>
+    <div class="header-sub">Conectando talento con oportunidades</div>
+</div>
+
+<!-- TÍTULO DEL CONTRATO -->
+<h1>Contrato de prestación de servicios</h1>
+
+<!-- DATOS PRINCIPALES -->
+<div class="meta">
+    <div class="meta-row">
+        <span class="meta-label">Proyecto:</span>
+        <span th:text="${contrato.tituloProyecto}">Proyecto</span>
+    </div>
+    <div class="meta-row">
+        <span class="meta-label">Empleador:</span>
+        <span th:text="${contrato.nombreEmpleador}">Empleador</span>
+    </div>
+    <div class="meta-row">
+        <span class="meta-label">Freelancer:</span>
+        <span th:text="${contrato.nombreFreelancer}">Freelancer</span>
+    </div>
+    <div class="meta-row">
+        <span class="meta-label">Fecha creación:</span>
+        <span th:text="${contrato.fechaCreacion}">2025-01-01</span>
+    </div>
+</div>
+
+<div class="section-text">
+    En la fecha indicada, las partes abajo firmantes acuerdan celebrar el presente
+    contrato de prestación de servicios en modalidad digital a través de la
+    plataforma Workeando.
+</div>
+
+<!-- REUNIDOS -->
+<div class="section-title">Reunidos</div>
+
+<div class="section-text">
+    <strong>De una parte:</strong>
+    <span th:text="${contrato.nombreEmpleador}">Nombre empleador</span>,
+    mayor de edad e identificado digitalmente en la plataforma, en adelante
+    “EL CLIENTE”.
+    <br/><br/>
+    <strong>Y de otra parte:</strong>
+    <span th:text="${contrato.nombreFreelancer}">Nombre freelancer</span>,
+    mayor de edad e identificado digitalmente en la plataforma, en adelante
+    “EL PRESTADOR/A DE SERVICIOS”.
+</div>
+
+<!-- EXPONEN -->
+<div class="section-title">Exponen</div>
+
+<div class="section-text">
+    Que EL CLIENTE desea contratar los servicios profesionales de EL PRESTADOR/A DE SERVICIOS.<br/>
+    Que EL PRESTADOR/A DE SERVICIOS declara tener la capacidad técnica y profesional necesaria
+    para realizar dichos servicios.<br/>
+    Que ambas partes desean formalizar el presente contrato, el cual se regirá por las
+    siguientes cláusulas:
+</div>
+
+<!-- 1. OBJETO -->
+<div class="section-title">1. Objeto del contrato</div>
+
+<div class="section-text">
+    EL PRESTADOR/A DE SERVICIOS se compromete a realizar los siguientes trabajos asociados
+    al proyecto:
+    <br/><br/>
+    <div th:text="${contrato.postulacion.proyecto.descripcion}"
+         style="white-space: pre-line; font-size: 11pt;"></div>
+</div>
+
+<!-- 2. DETALLES ADICIONALES -->
+<div class="section-title">2. Detalles adicionales acordados</div>
+
+<div class="section-text">
+    <div th:if="${contrato.detallesAdicionales != null and !contrato.detallesAdicionales.isBlank()}"
+         th:text="${contrato.detallesAdicionales}"
+         style="white-space: pre-line; font-size: 11pt;"></div>
+
+    <span th:if="${contrato.detallesAdicionales == null or contrato.detallesAdicionales.isBlank()}">
+        No se han especificado detalles adicionales.
+    </span>
+</div>
+
+<!-- 3. DURACIÓN -->
+<div class="section-title">3. Duración</div>
+
+<div class="section-text">
+    El presente contrato tendrá vigencia desde su emisión y cubrirá el tiempo requerido para la
+    ejecución de los servicios, salvo pacto distinto entre las partes mediante la plataforma.
+</div>
+
+<!-- 4. HONORARIOS -->
+<div class="section-title">4. Honorarios</div>
+
+<div class="section-text">
+    Los honorarios serán los que las partes acuerden a través de Workeando para el proyecto
+    correspondiente. Dichos términos económicos formarán parte integrante del presente contrato.
+</div>
+
+<!-- 5. FORMA DE PAGO -->
+<div class="section-title">5. Forma de pago</div>
+
+<div class="section-text">
+    El pago se realizará utilizando los medios y condiciones acordados en la plataforma Workeando,
+    pudiendo incluir pagos únicos, hitos o esquemas parciales según lo pactado.
+</div>
+
+<!-- 6. OBLIGACIONES DEL PRESTADOR/A -->
+<div class="section-title">6. Obligaciones del PRESTADOR/A</div>
+
+<div class="section-text">
+    El PRESTADOR/A DE SERVICIOS se obliga a:
+    <ul class="bullet-list">
+        <li>Realizar los servicios con profesionalismo y diligencia.</li>
+        <li>Cumplir los plazos y entregas acordados.</li>
+        <li>Guardar confidencialidad sobre toda información del CLIENTE.</li>
+    </ul>
+</div>
+
+<!-- 7. OBLIGACIONES DEL CLIENTE -->
+<div class="section-title">7. Obligaciones del CLIENTE</div>
+
+<div class="section-text">
+    EL CLIENTE se obliga a:
+    <ul class="bullet-list">
+        <li>Proporcionar la información y recursos necesarios para la ejecución del servicio.</li>
+        <li>Abonar los honorarios acordados en tiempo y forma.</li>
+        <li>Facilitar la comunicación y acceso a la información indispensable para el trabajo.</li>
+    </ul>
+</div>
+
+<!-- 8. CONFIDENCIALIDAD -->
+<div class="section-title">8. Confidencialidad</div>
+
+<div class="section-text">
+    Ambas partes se comprometen a no divulgar a terceros la información reservada o
+    confidencial a la que tengan acceso con motivo de este contrato, salvo obligación legal
+    o autorización expresa de la otra parte.
+</div>
+
+<!-- 9. PROPIEDAD INTELECTUAL -->
+<div class="section-title">9. Propiedad intelectual</div>
+
+<div class="section-text">
+    La titularidad sobre los trabajos y entregables será la que las partes acuerden en el
+    proyecto dentro de Workeando. En ausencia de pacto expreso, se entenderá que el CLIENTE
+    adquiere los derechos de uso sobre los entregables para la finalidad prevista.
+</div>
+
+<!-- 10. RESOLUCIÓN DEL CONTRATO -->
+<div class="section-title">10. Resolución del contrato</div>
+
+<div class="section-text">
+    Cualquiera de las partes podrá resolver el contrato mediante notificación digital a la otra,
+    sin perjuicio de las obligaciones económicas por trabajos ya realizados. En caso de
+    incumplimiento grave, la parte afectada podrá dar por terminado el contrato de forma
+    inmediata.
+</div>
+
+<!-- 11. LEGISLACIÓN APLICABLE -->
+<div class="section-title">11. Legislación aplicable</div>
+
+<div class="section-text">
+    El presente contrato se rige por la legislación aplicable en la jurisdicción del CLIENTE,
+    sin perjuicio de las normas de consumo y protección de datos que resulten aplicables.
+</div>
+
+<!-- FIRMAS -->
+<div class="section-title">Firma de las partes</div>
+
+<div class="section-text">
+    Mediante la aceptación digital en la plataforma Workeando, ambas partes declaran haber leído,
+    entendido y aceptado el contenido íntegro de este contrato.
+</div>
+
+<div class="firmas">
+    <div class="firma-block">
+        <!-- Firma EMPLEADOR sin imagen -->
+        <div class="firma-nombre" th:text="${contrato.nombreEmpleador}">Nombre empleador</div>
+        <div class="firma-digital"
+             th:if="${contrato.firmaEmpleadorDigital != null}"
+             th:text="${contrato.firmaEmpleadorDigital}">
+        </div>
+    </div>
+
+    <div class="firma-block">
+        <!-- Firma FREELANCER sin imagen -->
+        <div class="firma-nombre" th:text="${contrato.nombreFreelancer}">Nombre freelancer</div>
+        <div class="firma-digital"
+             th:if="${contrato.firmaFreelancerDigital != null}"
+             th:text="${contrato.firmaFreelancerDigital}">
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
