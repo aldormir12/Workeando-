@@ -1,0 +1,807 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Empleador - Workeando</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <header class="bg-light border-bottom">
+      <div
+        class="container-fluid d-flex justify-content-between align-items-center py-2 px-4"
+      >
+        <div
+          class="mb-4 p-3 border-start border-4 border-dark bg-light rounded"
+        >
+          <h4 class="fw-bold text-dark mb-1">
+            Bienvenido al portal del empleador
+          </h4>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <button type="button" class="btn btn-outline-dark btn-md px-4 ms-3">
+            Explora
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-primary btn-md px-3"
+            title="Enviar Mensaje"
+          >
+            <i class="fas fa-comments me-2"></i> Mensaje
+          </button>
+          <form th:action="@{/logout}" method="post" th:csrf="true">
+            <button type="submit" class="btn btn-danger">Cerrar sesión</button>
+          </form>
+        </div>
+      </div>
+    </header>
+
+    <!-- HERO PRINCIPAL -->
+    <section
+      class="hero-section text-white d-flex align-items-center"
+      style="
+        background: url('/img/emple.jpg') no-repeat center center;
+        background-size: cover;
+        height: 100vh;
+        position: relative;
+      "
+    >
+      <div
+        class="overlay"
+        style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+        "
+      ></div>
+
+      <!-- Contenido central -->
+      <div class="container text-center position-relative">
+        <h1 class="display-4 fw-bold mb-4">Panel de Empleador</h1>
+        <p class="lead mb-4">
+          Administra tus proyectos, contrata talento y lleva tu negocio al
+          siguiente nivel.
+        </p>
+
+        <a
+          href="#tablaproyectos"
+          class="btn btn-light btn-lg px-4 py-2 shadow-lg"
+          >Ver proyectos</a
+        >
+      </div>
+    </section>
+
+    <!-- SECCIÓN DE PROYECTOS PUBLICADOS CON PAGINACIÓN ELEGANTE -->
+    <section class="py-5 bg-white">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="fw-bold text-dark mb-2">Proyectos publicados</h2>
+            <p class="text-muted mb-0" th:if="${totalElements > 0}">
+              Mostrando <span class="fw-semibold" th:text="${proyectosPage.numberOfElements}">0</span> 
+              de <span class="fw-semibold" th:text="${totalElements}">0</span> proyectos
+            </p>
+          </div>
+          
+          <!-- Controles de ordenamiento y tamaño de página -->
+          <div class="d-flex gap-3 align-items-center">
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-sort me-1"></i>
+                Ordenar por
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" th:href="@{/emple(page=${currentPage}, size=${size}, sortBy='fechaPublicacion', sortDirection='desc')}">
+                  <i class="fas fa-calendar-alt me-2 text-primary"></i>Más recientes
+                </a></li>
+                <li><a class="dropdown-item" th:href="@{/emple(page=${currentPage}, size=${size}, sortBy='fechaPublicacion', sortDirection='asc')}">
+                  <i class="fas fa-calendar-alt me-2 text-secondary"></i>Más antiguos
+                </a></li>
+                <li><a class="dropdown-item" th:href="@{/emple(page=${currentPage}, size=${size}, sortBy='titulo', sortDirection='asc')}">
+                  <i class="fas fa-sort-alpha-down me-2 text-info"></i>Título A-Z
+                </a></li>
+                <li><a class="dropdown-item" th:href="@{/emple(page=${currentPage}, size=${size}, sortBy='estado', sortDirection='asc')}">
+                  <i class="fas fa-toggle-on me-2 text-success"></i>Por estado
+                </a></li>
+              </ul>
+            </div>
+            
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-list me-1"></i>
+                <span th:text="${size}">5</span> por página
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" th:href="@{/emple(page=0, size=5, sortBy=${sortBy}, sortDirection=${sortDirection})}">5 por página</a></li>
+                <li><a class="dropdown-item" th:href="@{/emple(page=0, size=10, sortBy=${sortBy}, sortDirection=${sortDirection})}">10 por página</a></li>
+                <li><a class="dropdown-item" th:href="@{/emple(page=0, size=20, sortBy=${sortBy}, sortDirection=${sortDirection})}">20 por página</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de proyectos -->
+        <div id="tablaproyectos" class="card border-0 shadow-sm rounded-3 overflow-hidden">
+          <div th:if="${proyectos.isEmpty()}" class="card-body text-center py-5">
+            <div class="text-muted">
+              <i class="fas fa-folder-open fa-3x mb-3 text-secondary"></i>
+              <h5 class="text-secondary">No tienes proyectos publicados</h5>
+              <p class="mb-4">Comienza publicando tu primer proyecto y encuentra el talento perfecto.</p>
+              <button
+                class="btn btn-primary btn-lg"
+                data-bs-toggle="modal"
+                data-bs-target="#modalPublicarProyecto"
+              >
+                <i class="fas fa-plus me-2"></i>Publicar mi primer proyecto
+              </button>
+            </div>
+          </div>
+
+          <div th:if="${!proyectos.isEmpty()}">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="border-0 px-4 py-3">
+                      <div class="d-flex align-items-center">
+                        <i class="fas fa-project-diagram me-2 text-primary"></i>
+                        Proyecto
+                      </div>
+                    </th>
+                    <th class="border-0 px-4 py-3">
+                      <div class="d-flex align-items-center">
+                        <i class="fas fa-align-left me-2 text-secondary"></i>
+                        Descripción
+                      </div>
+                    </th>
+                    <th class="border-0 px-4 py-3">
+                      <div class="d-flex align-items-center">
+                        <i class="fas fa-toggle-on me-2 text-success"></i>
+                        Estado
+                      </div>
+                    </th>
+                    <th class="border-0 px-4 py-3 text-center">
+                      <i class="fas fa-cogs me-1 text-dark"></i>
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="proyecto : ${proyectos}" class="border-bottom">
+                    <td class="px-4 py-3">
+                      <div>
+                        <h6 class="mb-1 fw-semibold text-dark" th:text="${proyecto.titulo}">Título del proyecto</h6>
+                        <small class="text-muted">
+                          <i class="fas fa-calendar-alt me-1"></i>
+                          Publicado <span th:text="${#temporals.format(proyecto.fechaPublicacion, 'dd/MM/yyyy HH:mm')}">fecha</span>
+                        </small>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <p class="mb-0 text-muted" th:text="${#strings.abbreviate(proyecto.descripcion, 80)}" style="line-height: 1.4;">
+                        Descripción del proyecto...
+                      </p>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="badge rounded-pill px-3 py-2" 
+                            th:classappend="${proyecto.estado == 'Abierto'} ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle'"
+                            th:text="${proyecto.estado}">Estado</span>
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                      <div class="dropdown">
+                        <button
+                          class="btn btn-light btn-sm dropdown-toggle rounded-pill px-3"
+                          type="button"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="min-width: 180px;">
+                          <li>
+                            <button
+                              class="dropdown-item d-flex align-items-center"
+                              th:onclick="'cambiarEstado(this, ' + ${proyecto.id} + ')'"
+                            >
+                              <i th:class="${proyecto.estado == 'Abierto'} ? 'fas fa-pause-circle me-2 text-warning' : 'fas fa-play-circle me-2 text-success'"></i>
+                              <span th:text="${proyecto.estado == 'Abierto' ? 'Pausar proyecto' : 'Activar proyecto'}">Acción</span>
+                            </button>
+                          </li>
+                          <li>
+                            <button
+                              class="dropdown-item d-flex align-items-center"
+                              th:onclick="'abrirModalEdicion(' + ${proyecto.id} + ')'"
+                            >
+                              <i class="fas fa-edit me-2 text-primary"></i>
+                              Editar proyecto
+                            </button>
+                          </li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li>
+                            <button
+                              class="dropdown-item d-flex align-items-center text-danger"
+                              th:onclick="'eliminarProyecto(this, ' + ${proyecto.id} + ')'"
+                            >
+                              <i class="fas fa-trash-alt me-2"></i>
+                              Eliminar proyecto
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- PAGINACIÓN ELEGANTE Y MODERNA -->
+            <div class="card-footer bg-white border-0 px-4 py-4" th:if="${totalPages > 1}">
+              <div class="row align-items-center">
+                <div class="col-md-6">
+                  <p class="text-muted small mb-0">
+                    Página <span class="fw-semibold" th:text="${currentPage + 1}">1</span> 
+                    de <span class="fw-semibold" th:text="${totalPages}">1</span>
+                    • Total: <span class="fw-semibold" th:text="${totalElements}">0</span> proyectos
+                  </p>
+                </div>
+                <div class="col-md-6">
+                  <nav aria-label="Navegación de páginas" class="d-flex justify-content-md-end justify-content-center">
+                    <ul class="pagination pagination-sm mb-0 shadow-sm rounded-3 overflow-hidden border">
+                      
+                      <!-- Botón Anterior -->
+                      <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link border-0 bg-white text-dark" 
+                           th:href="${currentPage > 0} ? @{/emple(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})} : '#'"
+                           aria-label="Anterior">
+                          <i class="fas fa-chevron-left"></i>
+                        </a>
+                      </li>
+
+                      <!-- Primera página si no está visible -->
+                      <li class="page-item" th:if="${startPage > 0}">
+                        <a class="page-link border-0 bg-white text-dark" 
+                           th:href="@{/emple(page=0, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">1</a>
+                      </li>
+                      
+                      <!-- Separador si hay gap -->
+                      <li class="page-item disabled" th:if="${startPage > 1}">
+                        <span class="page-link border-0 bg-white text-muted">...</span>
+                      </li>
+
+                      <!-- Páginas del rango -->
+                      <li class="page-item" 
+                          th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
+                          th:classappend="${pageNum == currentPage} ? 'active'">
+                        <a class="page-link border-0" 
+                           th:classappend="${pageNum == currentPage} ? 'bg-primary text-white' : 'bg-white text-dark'"
+                           th:href="@{/emple(page=${pageNum}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}"
+                           th:text="${pageNum + 1}">1</a>
+                      </li>
+
+                      <!-- Separador si hay gap al final -->
+                      <li class="page-item disabled" th:if="${endPage < totalPages - 2}">
+                        <span class="page-link border-0 bg-white text-muted">...</span>
+                      </li>
+                      
+                      <!-- Última página si no está visible -->
+                      <li class="page-item" th:if="${endPage < totalPages - 1}">
+                        <a class="page-link border-0 bg-white text-dark" 
+                           th:href="@{/emple(page=${totalPages - 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}"
+                           th:text="${totalPages}">Última</a>
+                      </li>
+
+                      <!-- Botón Siguiente -->
+                      <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                        <a class="page-link border-0 bg-white text-dark" 
+                           th:href="${currentPage < totalPages - 1} ? @{/emple(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})} : '#'"
+                           aria-label="Siguiente">
+                          <i class="fas fa-chevron-right"></i>
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOTÓN PARA ABRIR MODAL DE PUBLICAR NUEVO PROYECTO -->
+    <section class="py-5 bg-light text-center">
+      <div class="container">
+        <h2 class="fw-bold mb-4">Publica un nuevo Proyecto</h2>
+        <p class="text-muted">
+          ¿Tienes un nuevo proyecto que quieras publicar? ¡Hazlo ahora!
+        </p>
+        <!-- Botón que abre el modal -->
+        <button
+          id="btnAbrirModalPublicar"
+          class="btn btn-success btn-lg"
+          type="button"
+          data-bs-toggle="modal"
+          data-bs-target="#modalPublicarProyecto"
+        >
+          Publicar Proyecto
+        </button>
+      </div>
+    </section>
+
+    <!-- Modal para publicar proyecto -->
+    <div
+      class="modal fade"
+      id="modalPublicarProyecto"
+      tabindex="-1"
+      aria-labelledby="modalPublicarProyectoLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalPublicarProyectoLabel">
+              Publicar un Nuevo Proyecto
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <!-- Formulario para publicar proyecto -->
+            <form
+              id="formPublicarProyecto"
+              th:action="@{/empleador/publicar}"
+              method="post"
+              th:object="${proyecto}"
+            >
+              <div class="mb-3">
+                <label for="titulo" class="form-label"
+                  >Título del Proyecto</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="titulo"
+                  th:field="*{titulo}"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción</label>
+                <textarea
+                  class="form-control"
+                  id="descripcion"
+                  th:field="*{descripcion}"
+                  rows="4"
+                  required
+                ></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label for="categoria" class="form-label">Categoría</label>
+                <select
+                  class="form-select"
+                  id="categoria"
+                  th:field="*{categoria}"
+                  required
+                >
+                  <option value="" disabled selected>
+                    Selecciona una categoría
+                  </option>
+                  <option
+                    th:each="cat : ${categorias}"
+                    th:value="${cat.idCategoria}"
+                    th:text="${cat.nombre}"
+                  ></option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="presupuesto" class="form-label">Presupuesto</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="presupuesto"
+                  th:field="*{presupuesto}"
+                  min="10"
+                  max="50000"
+                  step="0.01"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="modalidadPago" class="form-label"
+                  >Modalidad de Pago</label
+                >
+                <select
+                  class="form-select"
+                  th:field="*{modalidadPago}"
+                  id="modalidadPago"
+                  required
+                >
+                  <option value="">Selecciona una opción</option>
+                  <option value="POR_DIA">Por día</option>
+                  <option value="POR_SEMANA">Por semana</option>
+                  <option value="POR_MES">Por mes</option>
+                  <option value="POR_PROYECTO">Por proyecto</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="ubicacion" class="form-label">Ubicación</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="ubicacion"
+                  th:field="*{ubicacion}"
+                  required
+                  placeholder="Ej: Calle 123, Ciudad, País"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="fechaInicio" class="form-label"
+                  >Fecha de Inicio</label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  id="fechaInicio"
+                  th:field="*{fechaInicio}"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="fechaFinal" class="form-label"
+                  >Fecha de Finalización</label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  id="fechaFinal"
+                  th:field="*{fechaFinal}"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="modalidad" class="form-label">Modalidad</label>
+                <select
+                  class="form-control"
+                  id="modalidad"
+                  th:field="*{modalidad}"
+                  required
+                >
+                  <option value="Presencial">Presencial</option>
+                  <option value="Remoto">Remoto</option>
+                  <option value="Híbrido">Híbrido</option>
+                </select>
+              </div>
+
+              <div
+                id="errorGeneral"
+                class="alert alert-danger d-none"
+                role="alert"
+              ></div>
+
+              <button type="submit" class="btn btn-primary">
+                Publicar Proyecto
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal de éxito -->
+    <div
+      class="modal fade"
+      id="modalExito"
+      tabindex="-1"
+      aria-labelledby="modalExitoLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-success">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title" id="modalExitoLabel">Éxito</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Cerrar"
+            ></button>
+          </div>
+          <div class="modal-body">Proyecto publicado con éxito.</div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-success"
+              data-bs-dismiss="modal"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal Confirmar Eliminación -->
+    <div
+      class="modal fade"
+      id="modalConfirmarEliminar"
+      tabindex="-1"
+      aria-labelledby="modalConfirmarEliminarLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalConfirmarEliminarLabel">
+              Confirmar eliminación
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Cerrar"
+            ></button>
+          </div>
+          <div class="modal-body">
+            ¿Seguro que quieres eliminar este proyecto?
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              id="btnCancelarEliminar"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              id="btnConfirmarEliminar"
+              class="btn btn-danger"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--alerta de confirmacion de eliminacion -->
+    <div
+      id="toastContainer"
+      class="toast-container position-fixed bottom-0 end-0 p-3"
+    ></div>
+
+    <!-- PROPOSICIONES RECIBIDAS -->
+    <section class="py-5">
+      <div class="container">
+        <h2 class="fw-bold text-primary mb-4">Propuestas Recibidas</h2>
+
+        <div class="row g-3" th:if="${postulaciones != null}">
+          <div class="col-12" th:each="postulacion : ${postulaciones}">
+            <div
+              class="border rounded px-4 py-3 d-flex justify-content-between align-items-center flex-wrap shadow-sm bg-white"
+              th:attr="data-modalidad=${postulacion.proyecto.modalidadPago.name()}"
+            >
+              <!-- Información -->
+              <div
+                class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 flex-grow-1"
+              >
+                <div
+                  class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center"
+                  style="width: 45px; height: 45px; font-weight: bold"
+                >
+                  <span th:text="${postulacion.nombreFreelancer.substring(0,1)}"
+                    >F</span
+                  >
+                </div>
+                <div>
+                  <div
+                    class="fw-semibold mb-1"
+                    th:text="'Propuesta para ' + ${postulacion.proyecto.titulo}"
+                  >
+                    Título del proyecto
+                  </div>
+                  <div
+                    class="text-muted small"
+                    th:text="${postulacion.nombreFreelancer}"
+                  >
+                    Nombre del freelancer
+                  </div>
+                  <div class="text-muted small">
+                    <strong>Correo:</strong>
+                    <span th:text="${postulacion.correoFreelancer}"
+                      >correo</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Monto y acciones -->
+              <div class="text-end mt-3 mt-sm-0">
+                <div th:if="${postulacion.montoPropuesto != null}">
+                  <span
+                    class="badge bg-warning text-dark px-3 py-2 rounded-pill"
+                  >
+                    Contraoferta:
+                    <span th:text="'S/ ' + ${postulacion.montoPropuesto}"
+                      >S/ 0.00</span
+                    >
+                    <span class="modalidad-text ms-1">(modalidad)</span>
+                  </span>
+                </div>
+                <div
+                  class="action-buttons d-flex flex-wrap justify-content-end gap-2 mt-3"
+                >
+                  <button class="btn-elegante btn-aceptar">Aceptar</button>
+                  <button class="btn-elegante btn-rechazar">Rechazar</button>
+                  <button class="btn-elegante btn-perfil">Ver perfil</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div th:if="${postulaciones.size() == 0}">
+          <div class="alert alert-info text-center">
+            No tienes propuestas recibidas aún.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-5 bg-white text-center">
+      <p class="text-muted mb-1">¿Tienes un proyecto?</p>
+      <h2 class="text-primary fw-bold mb-4">Arma tu equipo</h2>
+      <div class="container">
+        <div class="row g-4 justify-content-center">
+          <div class="col-md-5">
+            <div class="card shadow-sm p-4 text-start h-100">
+              <img
+                th:src="@{/img/trabajador.jpg.png}"
+                class="rounded-circle mb-3"
+                width="200"
+                height="5"
+                alt="Diseñador"
+              />
+              <h5><strong>¿Necesitas un diseñador de muebles? 🪑</strong></h5>
+              <p class="text-muted">
+                Conecta con los mejores talentos de Workeando.
+              </p>
+
+              <div class="mt-3">
+                <h6><strong>Sello de Calidad: </strong></h6>
+                <ul class="list-unstyled">
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>Diseño personalizado según tus necesidades.</span>
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span
+                      >Experiencia de más de 5 años en la industria del diseño
+                      de muebles.</span
+                    >
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>Materiales de alta calidad y sustentabilidad.</span>
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>Entrega puntual y con atención al detalle.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-5">
+            <div class="card shadow-sm p-4 text-start h-100">
+              <img
+                th:src="@{/img/traductora.jpg.png}"
+                class="rounded-circle mb-3"
+                width="200"
+                height="5"
+                alt="Traductora"
+              />
+              <h5><strong>¿Necesitas una traductora? 📖</strong></h5>
+              <p class="text-muted">¿En qué idioma la necesitas?</p>
+              <div class="mt-3">
+                <h6><strong>Sello de Calidad: </strong></h6>
+                <ul class="list-unstyled">
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>Traducción precisa y adaptada a tu contexto.</span>
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>Experiencia en traducción técnica y literaria.</span>
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span
+                      >Confidencialidad garantizada en todos los
+                      documentos.</span
+                    >
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>Entrega rápida sin comprometer la calidad.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-5 bg-white">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h2 class="text-primary fw-bold mb-3">
+              Recibe tu dinero y retira los fondos desde Workeando
+            </h2>
+            <p class="mb-3">
+              Elige tu método de pago, la moneda en la que quieres cobrar, y la
+              frecuencia de retiro de tus fondos.
+            </p>
+            <div class="d-flex gap-3 flex-wrap">
+              <img th:src="@{/img/pay.jpg}" height="80" alt="Paypal" />
+              <img th:src="@{/img/pre.jpg}" height="80" alt="Parepaga" />
+              <img
+                th:src="@{/img/mercado.jpg}"
+                height="80"
+                alt="Mercado Pago"
+              />
+              <img
+                th:src="@{/img/trans.jpg}"
+                height="80"
+                alt="Transferencia bancaria"
+              />
+            </div>
+          </div>
+          <div class="col-md-6 text-center">
+            <img
+              th:src="@{/img/joven.jpg}"
+              class="img-fluid rounded-circle"
+              alt="Usuario feliz con su pago"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script th:src="@{/js/tabla.js}"></script>
+  </body>
+</html>
+

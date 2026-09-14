@@ -1,0 +1,43 @@
+
+    .form-section {
+      max-width: 720px;
+      margin: auto;
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+    .form-check {
+      margin-bottom: 0.5rem;
+    }
+    .form-check-label {
+      cursor: pointer;
+    }
+    .error-msg {
+      color: #dc3545;
+      font-size: 0.875rem;
+    }
+    .selector-card {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 1.5rem;
+      transition: all 0.2s ease-in-out;
+      cursor: pointer;
+    }
+    .selector-card:hover {
+      box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+    }
+    .icon-lg {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+ .fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-in.show {
+  opacity: 1;
+  transform: translateY(0);
+}

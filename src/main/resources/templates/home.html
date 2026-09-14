@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workeando</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+  </head>
+  <body>
+    <!-- NAVBAR SUPERIOR -->
+    <header class="bg-light border-bottom">
+      <div
+        class="container-fluid d-flex justify-content-between align-items-center py-2 px-4"
+      >
+        <div class="d-flex align-items-center gap-3">
+          <span class="text-muted small">Español | English</span>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <a href="#" class="btn btn-outline-dark btn-sm">Explora</a>
+
+          <!-- Mostrar si no hay sesión iniciada -->
+          <div sec:authorize="isAnonymous()">
+            <a th:href="@{/usuarios/registro}" class="btn btn-success">
+              Iniciar sesión / Regístrate
+            </a>
+          </div>
+
+          <!-- Mostrar si hay sesión iniciada -->
+          <div sec:authorize="isAuthenticated()">
+            <form th:action="@{/logout}" method="post" th:csrf="true">
+              <button type="submit" class="btn btn-danger">
+                Cerrar sesión
+              </button>
+            </form>
+          </div>
+
+          <a
+            href="#"
+            class="btn btn-light btn-sm border ms-3 d-flex align-items-center gap-2"
+          >
+            📢 <span>Publica tu oferta ></span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- HERO PRINCIPAL -->
+    <section
+      class="hero-section text-center text-white py-5"
+      style="
+        background: url('/img/lap.jpg') no-repeat center center;
+        background-size: cover;
+        height: 100vh;
+        position: relative;
+      "
+    >
+      <div
+        class="overlay"
+        style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+        "
+      ></div>
+
+      <div class="container" style="position: relative; z-index: 1">
+        <h1 class="display-4 fw-bold">Workeando</h1>
+        <p class="lead">Conecta con trabajos temporales en todos los campos</p>
+        <a href="#" class="btn btn-dark btn-lg mt-3">Comienza ya</a>
+      </div>
+    </section>
+
+    <!-- SECCIÓN EXPLORA -->
+    <section class="py-5 bg-white">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="fw-bold">Explora</h2>
+          <button class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-filter"></i> Filtrar por categorías
+          </button>
+        </div>
+
+        <div class="row g-4">
+          <!-- CARD 1 -->
+          <div class="col-md-4">
+            <div class="card custom-card text-start p-3 shadow-sm h-100">
+              
+              <div class="card-body p-0">
+                <div class="d-flex justify-content-between mb-1">
+                  <h6 class="fw-bold mb-0">
+                    🍴 Ayudante de cocina para evento privado
+                  </h6>
+                </div>
+                <p class="mb-1 small">
+                  <strong>📍 Ubicación:</strong> Piura, Urb. Miraflores
+                </p>
+                <p class="mb-1 small">
+                  <strong>📅 Fechas:</strong> 18 y 19 de abril, 10 a.m. a 6 p.m.
+                </p>
+                <p class="mb-1 small">
+                  <strong>💰 Pago:</strong> S/120 por día
+                </p>
+                <p class="mb-3 small">
+                  <strong>🕒 Modalidad:</strong> Presencial – Tiempo parcial
+                </p>
+                <a href="#" class="btn btn-primary btn-sm">Ver oferta</a>
+                <span class="text-muted small">Publicado hace 9h</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 2 -->
+          <div class="col-md-4">
+            <div class="card custom-card text-start p-3 shadow-sm h-100">
+              
+              <div class="card-body p-0">
+                <div class="d-flex justify-content-between mb-1">
+                  <h6 class="fw-bold mb-0">
+                    🎤 Host bilingüe para tour gastronómico
+                  </h6>
+                </div>
+                <p class="mb-1 small">
+                  <strong>📍 Ubicación:</strong> Cusco – Plaza de Armas
+                </p>
+                <p class="mb-1 small">
+                  <strong>📅 Fechas:</strong> 14 de mayo, 2:00 p.m. a 7:00 p.m.
+                </p>
+                <p class="mb-1 small">
+                  <strong>💰 Pago:</strong> S/180 por día
+                </p>
+                <p class="mb-3 small">
+                  <strong>🕒 Modalidad:</strong> Presencial – Tiempo parcial
+                </p>
+                <a href="#" class="btn btn-primary btn-sm">Ver oferta</a>
+                <span class="text-muted small">Publicado hace 2h</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 3 -->
+          <div class="col-md-4">
+            <div class="card custom-card text-start p-3 shadow-sm h-100">
+              
+              <div class="card-body p-0">
+                <div class="d-flex justify-content-between mb-1">
+                  <h6 class="fw-bold mb-0">
+                    📊 Asistente de investigación para encuestas
+                  </h6>
+                </div>
+                <p class="mb-1 small">
+                  <strong>📍 Ubicación:</strong> Plaza – Catacaos y alrededores
+                </p>
+                <p class="mb-1 small">
+                  <strong>📅 Fechas:</strong> 20 al 26 de abril / 9:00 a.m. –
+                  5:00 p.m.
+                </p>
+                <p class="mb-1 small">
+                  <strong>💰 Pago:</strong> S/700 (semanal)
+                </p>
+                <p class="mb-3 small">
+                  <strong>🕒 Modalidad:</strong> Presencial – Tiempo completo
+                </p>
+                <a href="#" class="btn btn-primary btn-sm">Ver oferta</a>
+                <span class="text-muted small">Publicado hace 4h</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="py-5 bg-white text-center">
+      <p class="text-muted mb-1">¿Tienes un proyecto?</p>
+      <h2 class="text-primary fw-bold mb-4">Arma tu equipo</h2>
+      <div class="container">
+        <div class="row g-4 justify-content-center">
+          <div class="col-md-5">
+            <div class="card shadow-sm p-4 text-start h-100">
+              <img
+                th:src="@{/img/trabajador.jpg.png}"
+                class="rounded-circle mb-3"
+                width="200"
+                height="5"
+                alt="Diseñador"
+              />
+              <h5><strong>¿Necesitas un diseñador de muebles? 🪑</strong></h5>
+              <p class="text-muted">
+                Conecta con los mejores talentos de Workeando.
+              </p>
+
+              <div class="mt-3">
+                <h6><strong>Sello de Calidad: </strong></h6>
+                <ul class="list-unstyled">
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>Diseño personalizado según tus necesidades.</span>
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span
+                      >Experiencia de más de 5 años en la industria del diseño
+                      de muebles.</span
+                    >
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>Materiales de alta calidad y sustentabilidad.</span>
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>Entrega puntual y con atención al detalle.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-5">
+            <div class="card shadow-sm p-4 text-start h-100">
+              <img
+                th:src="@{/img/traductora.jpg.png}"
+                class="rounded-circle mb-3"
+                width="200"
+                height="5"
+                alt="Traductora"
+              />
+              <h5><strong>¿Necesitas una traductora? 📖</strong></h5>
+              <p class="text-muted">¿En qué idioma la necesitas?</p>
+              <div class="mt-3">
+                <h6><strong>Sello de Calidad: </strong></h6>
+                <ul class="list-unstyled">
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>Traducción precisa y adaptada a tu contexto.</span>
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>Experiencia en traducción técnica y literaria.</span>
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span
+                      >Confidencialidad garantizada en todos los
+                      documentos.</span
+                    >
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>Entrega rápida sin comprometer la calidad.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-5 bg-light">
+      <div class="container">
+        <h2 class="fw-bold text-primary">¿Todo listo para comenzar?</h2>
+        <p class="fw-semibold">Categorías destacadas</p>
+        <div class="row row-cols-1 row-cols-md-4 g-3 mt-3">
+          <!-- 1 -->
+          <div class="col">
+            <div class="card h-100 text-center p-3 border rounded shadow-sm">
+              <div class="fs-2 text-primary">🍳</div>
+              <h6 class="mt-2">Cocina y Gastronomía</h6>
+            </div>
+          </div>
+
+          <!-- 2 -->
+          <div class="col">
+            <div class="card h-100 text-center p-3 border rounded shadow-sm">
+              <div class="fs-2 text-primary">🎭</div>
+              <h6 class="mt-2">Creativos y Arte</h6>
+            </div>
+          </div>
+
+          <!-- 3 -->
+          <div class="col">
+            <div class="card h-100 text-center p-3 border rounded shadow-sm">
+              <div class="fs-2 text-primary">💻</div>
+              <h6 class="mt-2">Tecnología y Desarrollo</h6>
+            </div>
+          </div>
+
+          <!-- 4 -->
+          <div class="col">
+            <div class="card h-100 text-center p-3 border rounded shadow-sm">
+              <div class="fs-2 text-primary">✍️</div>
+              <h6 class="mt-2">Redacción y Traducción</h6>
+            </div>
+          </div>
+
+          <!-- 5 -->
+          <div class="col">
+            <div class="card h-100 text-center p-3 border rounded shadow-sm">
+              <div class="fs-2 text-primary">🧳</div>
+              <h6 class="mt-2">Para Turistas</h6>
+            </div>
+          </div>
+
+          <!-- 6 -->
+          <div class="col">
+            <div class="card h-100 text-center p-3 border rounded shadow-sm">
+              <div class="fs-2 text-primary">📚</div>
+              <h6 class="mt-2">Educación y Tutorías</h6>
+            </div>
+          </div>
+
+          <!-- 7 -->
+          <div class="col">
+            <div class="card h-100 text-center p-3 border rounded shadow-sm">
+              <div class="fs-2 text-primary">🧹</div>
+              <h6 class="mt-2">Servicios Generales</h6>
+            </div>
+          </div>
+
+          <!-- 8 -->
+          <div class="col">
+            <div class="card h-100 text-center p-3 border rounded shadow-sm">
+              <div class="fs-2 text-primary">📦</div>
+              <h6 class="mt-2">Logística y Operaciones</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-5 bg-white">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h2 class="text-primary fw-bold mb-3">
+              Recibe tu dinero y retira los fondos desde Workeando
+            </h2>
+            <p class="mb-3">
+              Elige tu método de pago, la moneda en la que quieres cobrar, y la
+              frecuencia de retiro de tus fondos.
+            </p>
+            <div class="d-flex gap-3 flex-wrap">
+              <img th:src="@{/img/pay.jpg}" height="80" alt="Paypal" />
+              <img th:src="@{/img/pre.jpg}" height="80" alt="Parepaga" />
+              <img
+                th:src="@{/img/mercado.jpg}"
+                height="80"
+                alt="Mercado Pago"
+              />
+              <img
+                th:src="@{/img/trans.jpg}"
+                height="80"
+                alt="Transferencia bancaria"
+              />
+            </div>
+          </div>
+          <div class="col-md-6 text-center">
+            <img
+              th:src="@{/img/joven.jpg}"
+              class="img-fluid rounded-circle"
+              alt="Usuario feliz con su pago"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
